@@ -9,7 +9,7 @@ export default function TitleBlock({
 }) {
   return (
     <div className="flex items-center justify-between p-6 sm:py-8 border-b">
-      <h1 className="text-2xl font-bold">{title}</h1>
+      <h1 className="text-3xl font-bold">{title}</h1>
       {children && children}
     </div>
   )

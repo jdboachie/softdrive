@@ -60,7 +60,7 @@ export default function OrganizationButton() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="max-w-fit p-0">
+      <PopoverContent className="min-w-[150px] p-0">
         <Command>
           <CommandInput placeholder="Search organizations..." className="h-9" />
           <CommandList>

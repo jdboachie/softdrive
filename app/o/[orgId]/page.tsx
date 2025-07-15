@@ -8,7 +8,7 @@ export default async function Page({
   const { orgId } = await params
   return (
     <div className="min-h-dvh p-6">
-      My org ID: {orgId}
+     <span className="sr-only"> My org ID: {orgId}</span>
       <Component />
     </div>
   )

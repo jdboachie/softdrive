@@ -21,13 +21,28 @@ export const createFile = mutation({
   args: {
     name: v.string(),
     orgId: v.id("organizations"),
+    storageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
-    if (!userId) return // should raise an error
+    if (!userId) throw new Error("Unauthorized")
 
-    // check for proper permissions
+    // check if user is a member of the org
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_orgId", (q) =>
+        q.eq("userId", userId).eq("orgId", args.orgId),
+      )
+      .unique()
 
-    await ctx.db.insert("files", { name: args.name, orgId: args.orgId })
+    if (!membership) {
+      throw new Error("User does not have access to this organization")
+    }
+
+    await ctx.db.insert("files", {
+      name: args.name,
+      orgId: args.orgId,
+      storageId: args.storageId,
+    })
   },
 })

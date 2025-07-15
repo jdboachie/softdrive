@@ -1,17 +1,21 @@
 import "./globals.css"
+
 import type { Metadata } from "next"
 import LocalFont from "next/font/local"
 import { Geist_Mono } from "next/font/google"
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
-import ConvexClientProvider from "@/components/auth/ConvexClientProvider"
-import { ThemeProvider } from "@/components/theme/theme-provider"
-import Header from "@/components/layout/header"
+
 import Footer from "@/components/layout/footer"
+import Header from "@/components/layout/header"
+import { Toaster } from "@/components/ui/sonner"
+
 import { OrganizationProvider } from "@/hooks/use-organization"
+import { ThemeProvider } from "@/components/theme/theme-provider"
+import ConvexClientProvider from "@/components/auth/ConvexClientProvider"
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
 
 export const metadata: Metadata = {
   title: "Softdrive",
-  description: "Your hard drive for computer files.",
+  description: "Your personal drive in the cloud",
   icons: {
     icon: "/convex.svg",
   },
@@ -57,6 +61,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <OrganizationProvider>
+                <Toaster />
                 <Header />
                 {children}
                 <Footer />

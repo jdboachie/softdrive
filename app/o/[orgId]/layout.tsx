@@ -1,10 +1,10 @@
-import UploadButton from '@/components/upload-button'
-import TitleBlock from '@/components/layout/title-block'
+import UploadButton from "@/components/upload-button"
+import TitleBlock from "@/components/layout/title-block"
 
-export default function Layout({children}: {children?: React.ReactNode}) {
+export default function Layout({ children }: { children?: React.ReactNode }) {
   return (
     <>
-      <TitleBlock title="Your files">
+      <TitleBlock title="Files">
         <UploadButton />
       </TitleBlock>
       {children}
