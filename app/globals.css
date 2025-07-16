@@ -6,6 +6,7 @@
 @theme inline {
   --color-ground: var(--ground);
   --color-skeleton: var(--skeleton);
+  --color-skeleton-end: var(--skeleton-end);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -47,7 +48,6 @@
 
 /* my variables */
 :root {
-  --radius: 0.65rem;
   --ground: oklch(0.985 0 0);
   --skeleton: oklch(0.92 0.004 286.32);
   --success: var(--color-green-500);
@@ -56,13 +56,14 @@
 
 .dark {
   --ground: oklch(0 0 0);
-  --skeleton: oklch(0.2 0 0);
+  --skeleton: oklch(0.22 0 0);
+  --skeleton-end: oklch(0.18 0 0);
   --brand: oklch(0.707 0.165 254.624);
   --highlight: oklch(0.852 0.199 91.936);
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.685rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -154,18 +155,18 @@
     content: "";
     position: absolute;
     inset: 0;
-    width: 600%;
+    width: 100%;
     background: linear-gradient(
       90deg,
-      transparent,
-      var(--skeleton, #e5e7eb),
-      transparent
+      var(--skeleton-end),
+      var(--skeleton),
+      var(--skeleton-end)
     );
-    animation: shimmer 6s linear infinite;
+    animation: shimmer 3s linear infinite;
   }
 
   .skeleton::after {
-    animation-delay: 3s;
+    animation-delay: 1.5s;
   }
 
   @keyframes shimmer {

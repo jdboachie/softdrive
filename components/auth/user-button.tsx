@@ -13,6 +13,7 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { UserIcon } from "@phosphor-icons/react"
+import { SignOutButton } from "./signout"
 
 
 export default function UserButton() {
@@ -32,7 +33,7 @@ export default function UserButton() {
         <DropdownMenuGroup>
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Sign out</DropdownMenuItem>
+          <DropdownMenuItem><SignOutButton /></DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

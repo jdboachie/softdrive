@@ -25,14 +25,18 @@ export default defineSchema({
     userId: v.id("users"),
     orgId: v.id("organizations"),
     role: v.union(v.literal("read"), v.literal("write"), v.literal("admin")),
-  }).index("by_userId", ["userId"])
+  })
+    .index("by_userId", ["userId"])
     .index("by_userId_orgId", ["userId", "orgId"]),
 
   files: defineTable({
     name: v.string(),
+    author: v.optional(v.id("users")),
     orgId: v.id("organizations"),
     storageId: v.id("_storage"),
+    trashed: v.boolean(),
+    trashedAt: v.optional(v.number()),
   })
     .index("by_orgId", ["orgId"])
-    .index("by_name", ["name"]),
+    .index("by_orgId_trashed", ["orgId", "trashed"])
 })

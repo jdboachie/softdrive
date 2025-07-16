@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation"
 import { useConvexAuth } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
 
-import { Button } from "@/components/ui/button"
-
 export function SignOutButton() {
   const { isAuthenticated } = useConvexAuth()
   const { signOut } = useAuthActions()
@@ -14,17 +12,16 @@ export function SignOutButton() {
   return (
     <>
       {isAuthenticated && (
-        <Button
-          variant={"secondary"}
-          size={"sm"}
+        <span
           onClick={() =>
             void signOut().then(() => {
               router.push("/signin")
             })
           }
+          className="size-full"
         >
           Sign out
-        </Button>
+        </span>
       )}
     </>
   )

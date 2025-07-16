@@ -90,7 +90,6 @@ export default function UploadButton() {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button
-          size={'lg'}
           onClick={() => {
             setDialogOpen(true)
           }}
@@ -136,7 +135,7 @@ export default function UploadButton() {
                             ])
                           }
                         }}
-                        className="border border-dashed max-h-72 overflow-auto rounded-lg bg-accent/15 p-3 flex flex-col gap-3"
+                        className="border border-dashed max-h-72 min-h-32 pjustify-center overflow-auto rounded-lg bg-accent/15 p-3 flex flex-col gap-3"
                       >
                         <Input
                           ref={inputRef}

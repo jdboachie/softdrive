@@ -2,7 +2,6 @@ import { SlashIcon } from "lucide-react"
 import UserButton from "@/components/auth/user-button"
 import { TabsIcon } from "@phosphor-icons/react/dist/ssr"
 import OrganizationButton from "@/components/auth/organization-button"
-import { SignOutButton } from "../auth/signout"
 
 export default function Header() {
   return (
@@ -14,7 +13,6 @@ export default function Header() {
           <OrganizationButton />
         </div>
         <div className="flex items-center w-fit gap-2">
-          <SignOutButton />
           <UserButton />
         </div>
       </div>
