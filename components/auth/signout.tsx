@@ -15,6 +15,7 @@ export function SignOutButton() {
     <>
       {isAuthenticated && (
         <Button
+          variant={"secondary"}
           size={"sm"}
           onClick={() =>
             void signOut().then(() => {

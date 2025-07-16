@@ -1,4 +1,4 @@
-import Component from "@/app/component"
+import FileList from "@/components/file-list"
 
 export default async function Page({
   params,
@@ -7,9 +7,9 @@ export default async function Page({
 }) {
   const { orgId } = await params
   return (
-    <div className="min-h-dvh p-6">
-     <span className="sr-only"> My org ID: {orgId}</span>
-      <Component />
+    <div className="min-h-[calc(100dvh-239px)] p-6">
+      <span className="sr-only"> My org ID: {orgId}</span>
+      <FileList />
     </div>
   )
 }

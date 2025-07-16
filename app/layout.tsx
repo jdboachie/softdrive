@@ -61,7 +61,14 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <OrganizationProvider>
-                <Toaster />
+                <Toaster
+                  richColors
+                  toastOptions={{
+                    style: {
+                      borderRadius: 'calc(var(--radius) + 7px)'
+                    }
+                  }}
+                />
                 <Header />
                 {children}
                 <Footer />

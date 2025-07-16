@@ -9,6 +9,16 @@ export const getFiles = query({
     if (!userId) return []
 
     // check for proper permissions
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_orgId", (q) =>
+        q.eq("userId", userId).eq("orgId", args.orgId),
+      )
+      .unique()
+
+    if (!membership) {
+      throw new Error("User does not have access to this organization")
+    }
 
     return ctx.db
       .query("files")

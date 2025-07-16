@@ -45,7 +45,7 @@ export default function OrganizationButton() {
           role="combobox"
           variant="ghost"
           aria-expanded={open}
-          className="w-[200px] justify-start px-1.5"
+          className="min-w-[200px] justify-start px-1.5"
         >
           {value && <Avatar name={organization?.name ?? undefined} />}
           {value === undefined ? (
@@ -72,7 +72,9 @@ export default function OrganizationButton() {
                   value={org.name}
                   onSelect={(selectedName) => {
                     setValue(selectedName === value ? "" : selectedName)
-                    const selectedOrg = organizations?.find((o) => o.name === selectedName)
+                    const selectedOrg = organizations?.find(
+                      (o) => o.name === selectedName,
+                    )
                     if (selectedOrg) {
                       router.push(`/o/${selectedOrg._id}`)
                     }

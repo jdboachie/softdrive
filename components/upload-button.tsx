@@ -56,6 +56,8 @@ export default function UploadButton() {
       toast.error("Unauthorized")
       return
     }
+    form.reset()
+    setDialogOpen(false)
     toast.promise(
       Promise.all(
         values.files.map(async (file) => {
@@ -77,8 +79,8 @@ export default function UploadButton() {
         }),
       ),
       {
-        loading: "Uploading files...",
-        success: "Files uploaded successfully!",
+        loading: `Uploading ${values.files.length} file${values.files.length > 1 ? "s" : ""}...`,
+        success: `${values.files.length} file${values.files.length > 1 ? "s" : ""} uploaded successfully!`,
         error: "Upload failed",
       },
     )
@@ -88,12 +90,13 @@ export default function UploadButton() {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button
+          size={'lg'}
           onClick={() => {
             setDialogOpen(true)
           }}
         >
           <UploadIcon weight="bold" size={32} />
-          Upload file
+          Upload files
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -202,7 +205,9 @@ export default function UploadButton() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Submit</Button>
+                <Button type="submit" disabled={form.formState.isLoading}>
+                  Submit
+                </Button>
               </div>
             </form>
           </Form>
