@@ -4,10 +4,7 @@ import type { Metadata } from "next"
 import LocalFont from "next/font/local"
 import { Geist_Mono } from "next/font/google"
 
-import Footer from "@/components/layout/footer"
-import Header from "@/components/layout/header"
 import { Toaster } from "@/components/ui/sonner"
-
 import { OrganizationProvider } from "@/hooks/use-organization"
 import { ThemeProvider } from "@/components/theme/theme-provider"
 import ConvexClientProvider from "@/components/auth/ConvexClientProvider"
@@ -69,9 +66,7 @@ export default function RootLayout({
                     }
                   }}
                 />
-                <Header />
                 {children}
-                <Footer />
               </OrganizationProvider>
             </ThemeProvider>
           </ConvexClientProvider>

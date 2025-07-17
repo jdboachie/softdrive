@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useOrganization } from "@/hooks/use-organization"
 import CreateOrganizationButton from "./create-organization-button"
+import { Skeleton } from "../ui/skeleton"
 
 export default function OrganizationButton() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function OrganizationButton() {
         >
           {value && <Avatar name={organization?.name ?? undefined} />}
           {value === undefined ? (
-            <div>loading...</div>
+            <Skeleton className="h-full w-full" />
           ) : (
             <span className="w-full justify-between flex items-center gap-1.5">
               {value

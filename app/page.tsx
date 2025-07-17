@@ -1,10 +1,10 @@
-import FileList from "@/components/file-list"
+import { SignOutButton } from "@/components/auth/signout";
 
 export default function Home() {
   return (
     <div className={`flex flex-col min-h-screen p-6`}>
-      <h1 className="text-xl font-bold">Your files</h1>
-      <FileList />
+      Nothing you dey do for here o?!
+      <SignOutButton />
     </div>
   )
 }

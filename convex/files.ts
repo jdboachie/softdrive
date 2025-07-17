@@ -3,7 +3,10 @@ import { internalMutation, mutation, query } from "./_generated/server"
 import { getAuthUserId } from "@convex-dev/auth/server"
 
 export const getFiles = query({
-  args: { orgId: v.id("organizations") },
+  args: {
+    orgId: v.id("organizations"),
+    searchQuery: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
     if (!userId) return []
@@ -19,17 +22,29 @@ export const getFiles = query({
       throw new Error("User does not have access to this organization")
     }
 
-    return ctx.db
+    const files = await ctx.db
       .query("files")
       .withIndex("by_orgId_trashed", (q) =>
-        q.eq("orgId", args.orgId).eq("trashed", false)
+        q.eq("orgId", args.orgId).eq("trashed", false),
       )
+      .order("desc")
       .collect()
+
+    if (!args.searchQuery) return files
+
+    const searchLower = args.searchQuery.toLowerCase()
+
+    return files.filter((file) =>
+      file.name?.toLowerCase().includes(searchLower),
+    )
   },
 })
 
 export const getTrashedFiles = query({
-  args: { orgId: v.id("organizations") },
+  args: {
+    orgId: v.id("organizations"),
+    searchQuery: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
     if (!userId) return []
@@ -45,14 +60,24 @@ export const getTrashedFiles = query({
       throw new Error("User does not have access to this organization")
     }
 
-    return ctx.db
+    const files = await ctx.db
       .query("files")
       .withIndex("by_orgId_trashed", (q) =>
         q.eq("orgId", args.orgId).eq("trashed", true)
       )
       .collect()
+
+    if (args.searchQuery?.trim()) {
+      const searchLower = args.searchQuery.toLowerCase()
+      return files.filter((file) =>
+        file.name?.toLowerCase().includes(searchLower)
+      )
+    }
+
+    return files
   },
 })
+
 
 export const createFile = mutation({
   args: {
@@ -91,11 +116,11 @@ export const trashFile = mutation({
     orgId: v.id("organizations"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Unauthorized");
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
 
-    const file = await ctx.db.get(args.fileId);
-    if (!file) throw new Error("File not found");
+    const file = await ctx.db.get(args.fileId)
+    if (!file) throw new Error("File not found")
 
     const membership = await ctx.db
       .query("memberships")
@@ -108,17 +133,16 @@ export const trashFile = mutation({
       return
     }
 
-    const allowed = membership.role === 'write' || membership.role === 'admin'
+    const allowed = membership.role === "write" || membership.role === "admin"
 
-    if (!allowed) throw new Error("No permission to trash this file");
+    if (!allowed) throw new Error("No permission to trash this file")
 
     await ctx.db.patch(args.fileId, {
       trashed: true,
       trashedAt: Date.now(),
-    });
+    })
   },
-});
-
+})
 
 export const deleteTrashedFilesViaCron = internalMutation({
   handler: async (ctx) => {
@@ -130,16 +154,15 @@ export const deleteTrashedFilesViaCron = internalMutation({
       .filter((f) =>
         f.and(
           f.eq(f.field("trashed"), true),
-          f.lt(f.field("trashedAt"), cutoff)
-        )
+          f.lt(f.field("trashedAt"), cutoff),
+        ),
       )
       .collect()
 
     for (const file of oldFiles) {
       console.info(`Deleting ${file.name}`)
       await ctx.db.delete(file._id)
-      await ctx.storage.delete(file.storageId);
+      await ctx.storage.delete(file.storageId)
     }
-  }
+  },
 })
-

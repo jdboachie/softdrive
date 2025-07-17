@@ -31,7 +31,7 @@ export default defineSchema({
 
   files: defineTable({
     name: v.string(),
-    author: v.optional(v.id("users")),
+    author: v.id("users"),
     orgId: v.id("organizations"),
     storageId: v.id("_storage"),
     trashed: v.boolean(),

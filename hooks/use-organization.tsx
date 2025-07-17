@@ -28,9 +28,12 @@ export function OrganizationProvider({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const orgId = pathname.startsWith("/o/")
-    ? (pathname.split("/")[2] ?? undefined) as Id<"organizations">
-    : undefined
+  const orgId =
+    pathname === "/o"
+      ? undefined
+      : pathname.startsWith("/o/")
+        ? ((pathname.split("/")[2] ?? undefined) as Id<"organizations">)
+        : undefined
 
   const organization = useQuery(api.organizations.getCurrentOrg, { orgId })
   const [loading, setLoading] = React.useState<boolean>(true)

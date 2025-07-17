@@ -144,10 +144,13 @@
     @apply bg-ground text-foreground;
   }
 
+  .containor {
+    @apply max-w-[1440px] mx-auto 2xl:container;
+  }
+
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: var(--background);
   }
 
   .skeleton::before,
@@ -162,11 +165,11 @@
       var(--skeleton),
       var(--skeleton-end)
     );
-    animation: shimmer 3s linear infinite;
+    animation: shimmer 2s linear infinite;
   }
 
   .skeleton::after {
-    animation-delay: 1.5s;
+    animation-delay: 1s;
   }
 
   @keyframes shimmer {

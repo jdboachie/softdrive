@@ -10,10 +10,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { useQuery } from "convex/react"
+import { SignOutButton } from "./signout"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
-import { UserIcon } from "@phosphor-icons/react"
-import { SignOutButton } from "./signout"
+import UserImage from "../user-image"
+import { Skeleton } from "../ui/skeleton"
 
 
 export default function UserButton() {
@@ -22,8 +23,9 @@ export default function UserButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="outline" className="rounded-full shadow-none">
-          <UserIcon size={32} />
+        <Button size="icon" variant="outline" className="rounded-full shadow-none size-9 p-px">
+          {user ? <UserImage src={user?.image} /> : <Skeleton className="rounded-full" />}
+
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

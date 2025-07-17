@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 
 export default function Error({
   error,
@@ -17,8 +17,10 @@ export default function Error({
 
   return (
     <div className='p-6 h-full mx-auto grid place-items-center gap-3 max-w-lg'>
-      <h1 className='font-semibold text-xl'>Something went wrong!</h1>
+      <h1 className='font-medium text-xl'>Something went wrong!</h1>
       <Button
+        size={'sm'}
+        variant={'outline'}
         onClick={
           // Attempt to recover by trying to re-render the segment
           () => reset()
