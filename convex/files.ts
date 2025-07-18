@@ -81,6 +81,8 @@ export const getTrashedFiles = query({
 export const createFile = mutation({
   args: {
     name: v.string(),
+    size: v.number(),
+    type: v.string(),
     teamId: v.id("teams"),
     storageId: v.id("_storage"),
   },
@@ -101,6 +103,8 @@ export const createFile = mutation({
 
     await ctx.db.insert("files", {
       name: args.name,
+      type: args.type,
+      size: args.size,
       author: userId,
       teamId: args.teamId,
       trashed: false,
@@ -141,6 +145,64 @@ export const trashFile = mutation({
       trashedAt: Date.now(),
     })
   },
+})
+
+export const restoreFile = mutation({
+  args: {
+    fileId: v.id("files"),
+    teamId: v.id("teams"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
+
+    const file = await ctx.db.get(args.fileId)
+    if (!file) throw new Error("File not found")
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
+      )
+      .unique()
+
+    if (!membership || membership.role !== "admin") { // or write
+      throw new Error("No permission to restore this file")
+    }
+
+    await ctx.db.patch(args.fileId, {
+      trashed: false,
+      trashedAt: undefined,
+    })
+  },
+})
+
+export const deleteFilePermanently = mutation({
+  args: {
+    fileId: v.id("files"),
+    teamId: v.id("teams"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
+
+    const file = await ctx.db.get(args.fileId)
+    if (!file) throw new Error("File not found")
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
+      )
+      .unique()
+
+    if (!membership || membership.role !== "admin") { // or write
+      throw new Error("No permission to delete this file")
+    }
+
+    await ctx.storage.delete(file.storageId)
+    await ctx.db.delete(file._id)
+  }
 })
 
 export const deleteTrashedFilesViaCron = internalMutation({

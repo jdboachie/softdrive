@@ -36,7 +36,7 @@ export default function TrashedFileList() {
       {files && files.length > 0 && (
         <ul className="grid w-full h-fit">
           {files?.map((file) => (
-            <FileItem key={file._id} file={file} />
+            <FileItem key={file._id} file={file} trash />
           ))}
         </ul>
       )}

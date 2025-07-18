@@ -4,16 +4,14 @@ import { z } from "zod"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import {
-  AlertDialog,
-  AlertDialogTitle,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogDescription,
-} from "@/components/ui/alert-dialog"
+  Dialog,
+  DialogTitle,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+  DialogContent,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -56,8 +54,8 @@ export default function CreateTeamButton() {
   }
 
   return (
-    <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <AlertDialogTrigger asChild>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
         <Button
           size={"sm"}
           variant={"ghost"}
@@ -66,14 +64,14 @@ export default function CreateTeamButton() {
         >
           <PlusCircleIcon className="text-primary" /> Create team
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Create a team</AlertDialogTitle>
-          <AlertDialogDescription>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create a team</DialogTitle>
+          <DialogDescription>
             Continue to start collaborating on Pro with increased usage,
             additional security features, and support.
-          </AlertDialogDescription>
+          </DialogDescription>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
               <div className="py-6">
@@ -96,14 +94,14 @@ export default function CreateTeamButton() {
               </div>
             </form>
           </Form>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleSubmit}>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant={'outline'}>Cancel</Button>
+          <Button onClick={handleSubmit}>
             Create team
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

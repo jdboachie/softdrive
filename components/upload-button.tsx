@@ -73,6 +73,8 @@ export default function UploadButton() {
           const { storageId } = await result.json()
           createFile({
             name: file.name,
+            type: file.type,
+            size: file.size,
             teamId: team._id,
             storageId: storageId,
           })
@@ -103,8 +105,7 @@ export default function UploadButton() {
           <DialogTitle>Upload file</DialogTitle>
           <DialogDescription>
             Add files to{" "}
-            <span className="font-medium">{team?.name}&apos;s</span>{" "}
-            drive
+            <span className="font-medium">{team?.name}&apos;s</span> drive
           </DialogDescription>
         </DialogHeader>
         <div className="p-5">

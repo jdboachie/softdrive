@@ -11,6 +11,7 @@ export function SignInButton() {
       size={"lg"}
       variant={"outline"}
       onClick={() => void signIn("google", { redirectTo: "/t" })}
+      className="h-12 rounded-full"
     >
       <Image
         src={'/google.webp'}
