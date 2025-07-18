@@ -2,8 +2,8 @@ import { v } from "convex/values"
 import { query, mutation } from "./_generated/server"
 import { getAuthUserId } from "@convex-dev/auth/server"
 
-export const getCurrentOrg = query({
-  args: { orgId: v.optional(v.id("organizations"))},
+export const getCurrentTeam = query({
+  args: { teamId: v.optional(v.id("teams"))},
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
     if (!userId) {
@@ -11,18 +11,18 @@ export const getCurrentOrg = query({
       return null
     }
 
-    if (args.orgId && args.orgId !== undefined) {
-      return ctx.db.get(args.orgId)
+    if (args.teamId && args.teamId !== undefined) {
+      return ctx.db.get(args.teamId)
     } else {
-      const defaultOrgId = (await ctx.db.get(userId))?.defaultOrgId
-      if (!defaultOrgId) return null
-      return ctx.db.get(defaultOrgId)
+      const defaultTeamId = (await ctx.db.get(userId))?.defaultTeamId
+      if (!defaultTeamId) return null
+      return ctx.db.get(defaultTeamId)
     }
 
   },
 })
 
-export const getUserOrganizations = query({
+export const getUserTeams = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx)
     if (!userId) return []
@@ -32,18 +32,18 @@ export const getUserOrganizations = query({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect()
 
-    const orgIds = memberships.map((m) => m.orgId)
+    const teamIds = memberships.map((m) => m.teamId)
 
-    const organizations = await Promise.all(
-      orgIds.map((orgId) => ctx.db.get(orgId)),
+    const teams = await Promise.all(
+      teamIds.map((teamId) => ctx.db.get(teamId)),
     )
 
-    // filter out deleted orgs
-    return organizations.filter((org) => org !== null)
+    // filter out deleted teams
+    return teams.filter((team) => team !== null)
   },
 })
 
-export const createOrganization = mutation({
+export const createTeam = mutation({
   args: { name: v.string() },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -52,17 +52,17 @@ export const createOrganization = mutation({
       return null
     }
 
-    // create organization
-    const newOrgId = await ctx.db.insert("organizations", { name: args.name })
+    // create team
+    const newTeamId = await ctx.db.insert("teams", { name: args.name })
 
-    // add current authuser to organization
+    // add current authuser to team
     await ctx.db.insert("memberships", {
       userId: userId,
-      orgId: newOrgId,
+      teamId: newTeamId,
       role: "admin",
     })
 
-    // return orgId for redirect
-    return newOrgId
+    // return teamId for redirect
+    return newTeamId
   },
 })

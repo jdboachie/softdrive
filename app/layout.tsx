@@ -5,7 +5,7 @@ import LocalFont from "next/font/local"
 import { Geist_Mono } from "next/font/google"
 
 import { Toaster } from "@/components/ui/sonner"
-import { OrganizationProvider } from "@/hooks/use-organization"
+import { TeamProvider } from "@/hooks/use-team"
 import { ThemeProvider } from "@/components/theme/theme-provider"
 import ConvexClientProvider from "@/components/auth/ConvexClientProvider"
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
@@ -57,7 +57,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <OrganizationProvider>
+              <TeamProvider>
                 <Toaster
                   richColors
                   toastOptions={{
@@ -67,7 +67,7 @@ export default function RootLayout({
                   }}
                 />
                 {children}
-              </OrganizationProvider>
+              </TeamProvider>
             </ThemeProvider>
           </ConvexClientProvider>
         </body>

@@ -31,18 +31,18 @@ import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useRouter } from "next/navigation"
 
-const createOrganizationFormSchema = z.object({
+const createTeamFormSchema = z.object({
   name: z.string().min(2).max(50),
 })
 
-export default function CreateOrganizationButton() {
+export default function CreateTeamButton() {
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false)
 
   const router = useRouter()
-  const createOrganization = useMutation(api.organizations.createOrganization)
+  const createTeam = useMutation(api.teams.createTeam)
 
-  const form = useForm<z.infer<typeof createOrganizationFormSchema>>({
-    resolver: zodResolver(createOrganizationFormSchema),
+  const form = useForm<z.infer<typeof createTeamFormSchema>>({
+    resolver: zodResolver(createTeamFormSchema),
     defaultValues: {
       name: "",
     },
@@ -50,8 +50,8 @@ export default function CreateOrganizationButton() {
 
   async function handleSubmit() {
     const name = form.getValues("name")
-    const newOrgId = await createOrganization({ name: name })
-    router.push(`/o/${newOrgId}`)
+    const newTeamId = await createTeam({ name: name })
+    router.push(`/t/${newTeamId}`)
     setDialogOpen(false)
   }
 
@@ -64,12 +64,12 @@ export default function CreateOrganizationButton() {
           className="justify-start font-normal"
           onClick={() => setDialogOpen(true)}
         >
-          <PlusCircleIcon className="text-primary" /> Create organization
+          <PlusCircleIcon className="text-primary" /> Create team
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Create an organization</AlertDialogTitle>
+          <AlertDialogTitle>Create a team</AlertDialogTitle>
           <AlertDialogDescription>
             Continue to start collaborating on Pro with increased usage,
             additional security features, and support.
@@ -82,7 +82,7 @@ export default function CreateOrganizationButton() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Organization name</FormLabel>
+                      <FormLabel>Team name</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -100,7 +100,7 @@ export default function CreateOrganizationButton() {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleSubmit}>
-            Create organization
+            Create team
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

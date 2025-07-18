@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useOrganization } from "@/hooks/use-organization"
+import { useTeam } from "@/hooks/use-team"
 import { FileIcon, UploadIcon } from "@phosphor-icons/react"
 
 const formSchema = z.object({
@@ -35,7 +35,7 @@ const formSchema = z.object({
 })
 
 export default function UploadButton() {
-  const { organization } = useOrganization()
+  const { team } = useTeam()
   const createFile = useMutation(api.files.createFile)
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl)
 
@@ -52,7 +52,7 @@ export default function UploadButton() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!organization) {
+    if (!team) {
       toast.error("Unauthorized")
       return
     }
@@ -73,7 +73,7 @@ export default function UploadButton() {
           const { storageId } = await result.json()
           createFile({
             name: file.name,
-            orgId: organization._id,
+            teamId: team._id,
             storageId: storageId,
           })
         }),
@@ -103,7 +103,7 @@ export default function UploadButton() {
           <DialogTitle>Upload file</DialogTitle>
           <DialogDescription>
             Add files to{" "}
-            <span className="font-medium">{organization?.name}&apos;s</span>{" "}
+            <span className="font-medium">{team?.name}&apos;s</span>{" "}
             drive
           </DialogDescription>
         </DialogHeader>

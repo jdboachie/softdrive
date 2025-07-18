@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
-import { useOrganization } from "@/hooks/use-organization"
+import { useTeam } from "@/hooks/use-team"
 import { Doc } from "@/convex/_generated/dataModel"
 import { formatBytes } from "@/lib/utils"
 import UserImage from "./user-image"
@@ -33,7 +33,7 @@ export default function FileItem ({
   file: Doc<"files">
   // view?: "grid" | "list"
 }) {
-  const { organization } = useOrganization()
+  const { team } = useTeam()
   const fileMetadata = useQuery(api.storage.getMetadata, {
     storageId: file.storageId,
   })
@@ -150,8 +150,8 @@ export default function FileItem ({
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => {
-                  if (!organization) return
-                  trashFile({ orgId: organization._id, fileId: file._id })
+                  if (!team) return
+                  trashFile({ teamId: team._id, fileId: file._id })
                   toast.info("File moved to trash", {
                     description: `${file.name} has been moved to trash successfully.`,
                   })

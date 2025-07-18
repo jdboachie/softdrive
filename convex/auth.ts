@@ -7,18 +7,18 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     async afterUserCreatedOrUpdated(ctx, args) {
       if (args.existingUserId) return
 
-      const orgId = await ctx.db.insert("organizations", {
+      const teamId = await ctx.db.insert("teams", {
         name: `${args.profile.email?.split("@")[0]}s files`,
       })
 
       await ctx.db.insert("memberships", {
         userId: args.userId,
-        orgId,
+        teamId: teamId,
         role: "admin",
       })
 
       await ctx.db.patch(args.userId, {
-        defaultOrgId: orgId,
+        defaultTeamId: teamId,
       })
     },
   },

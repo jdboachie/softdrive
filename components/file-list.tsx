@@ -5,18 +5,18 @@ import { useQuery } from "convex/react"
 import { Skeleton } from "./ui/skeleton"
 import { api } from "@/convex/_generated/api"
 import { FileIcon } from "@phosphor-icons/react"
-import { useOrganization } from "@/hooks/use-organization"
+import { useTeam } from "@/hooks/use-team"
 import { useSearchParams } from "next/navigation"
 
 export default function FileList() {
-  const { organization } = useOrganization()
+  const { team } = useTeam()
   const query = useSearchParams().get('q')
 
   const files = useQuery(
     api.files.getFiles,
-    organization
+    team
       ? {
-        orgId: organization._id,
+        teamId: team._id,
         searchQuery: query ? query : undefined
         }
       : "skip",
@@ -36,7 +36,7 @@ export default function FileList() {
       <div className="text-muted-foreground flex flex-col items-center justify-center h-full gap-2">
         <FileIcon size={56} weight={"thin"} />
         <p className="text-sm text-muted-foreground text-center">
-          No files in {organization?.name}
+          No files in {team?.name}
         </p>
       </div>
     )
@@ -54,7 +54,7 @@ export default function FileList() {
         <div className="text-muted-foreground flex flex-col items-center justify-center h-full gap-2">
           <FileIcon size={56} weight={"thin"} />
           <p className="text-sm text-muted-foreground text-center">
-            No files {query ? 'found' : `in ${organization?.name}`}
+            No files {query ? 'found' : `in ${team?.name}`}
           </p>
         </div>
       )}

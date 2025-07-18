@@ -10,7 +10,7 @@ export function SignInButton() {
     <Button
       size={"lg"}
       variant={"outline"}
-      onClick={() => void signIn("google", { redirectTo: "/o" })}
+      onClick={() => void signIn("google", { redirectTo: "/t" })}
     >
       <Image
         src={'/google.webp'}

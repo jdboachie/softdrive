@@ -1,18 +1,18 @@
 "use client"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { useOrganization } from "@/hooks/use-organization"
+import { useTeam } from "@/hooks/use-team"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 function Page() {
   const router = useRouter()
-  const { organization } = useOrganization()
+  const { team } = useTeam()
 
   useEffect(() => {
-    if (organization)
-    router.push(`/o/${organization._id}`)
-  }, [organization, router]);
+    if (team)
+    router.push(`/t/${team._id}`)
+  }, [team, router]);
 
   return <Skeleton className="h-screen w-full" />
 }

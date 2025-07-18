@@ -4,7 +4,7 @@ import { getAuthUserId } from "@convex-dev/auth/server"
 
 export const getFiles = query({
   args: {
-    orgId: v.id("organizations"),
+    teamId: v.id("teams"),
     searchQuery: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -13,19 +13,19 @@ export const getFiles = query({
 
     const membership = await ctx.db
       .query("memberships")
-      .withIndex("by_userId_orgId", (q) =>
-        q.eq("userId", userId).eq("orgId", args.orgId),
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
       )
       .unique()
 
     if (!membership) {
-      throw new Error("User does not have access to this organization")
+      throw new Error("User does not have access to this team")
     }
 
     const files = await ctx.db
       .query("files")
-      .withIndex("by_orgId_trashed", (q) =>
-        q.eq("orgId", args.orgId).eq("trashed", false),
+      .withIndex("by_teamId_trashed", (q) =>
+        q.eq("teamId", args.teamId).eq("trashed", false),
       )
       .order("desc")
       .collect()
@@ -42,7 +42,7 @@ export const getFiles = query({
 
 export const getTrashedFiles = query({
   args: {
-    orgId: v.id("organizations"),
+    teamId: v.id("teams"),
     searchQuery: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -51,19 +51,19 @@ export const getTrashedFiles = query({
 
     const membership = await ctx.db
       .query("memberships")
-      .withIndex("by_userId_orgId", (q) =>
-        q.eq("userId", userId).eq("orgId", args.orgId),
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
       )
       .unique()
 
     if (!membership) {
-      throw new Error("User does not have access to this organization")
+      throw new Error("User does not have access to this team")
     }
 
     const files = await ctx.db
       .query("files")
-      .withIndex("by_orgId_trashed", (q) =>
-        q.eq("orgId", args.orgId).eq("trashed", true)
+      .withIndex("by_teamId_trashed", (q) =>
+        q.eq("teamId", args.teamId).eq("trashed", true)
       )
       .collect()
 
@@ -78,11 +78,10 @@ export const getTrashedFiles = query({
   },
 })
 
-
 export const createFile = mutation({
   args: {
     name: v.string(),
-    orgId: v.id("organizations"),
+    teamId: v.id("teams"),
     storageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
@@ -91,19 +90,19 @@ export const createFile = mutation({
 
     const membership = await ctx.db
       .query("memberships")
-      .withIndex("by_userId_orgId", (q) =>
-        q.eq("userId", userId).eq("orgId", args.orgId),
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
       )
       .unique()
 
     if (!membership) {
-      throw new Error("User does not have access to this organization")
+      throw new Error("User does not have access to this team")
     }
 
     await ctx.db.insert("files", {
       name: args.name,
       author: userId,
-      orgId: args.orgId,
+      teamId: args.teamId,
       trashed: false,
       storageId: args.storageId,
     })
@@ -113,7 +112,7 @@ export const createFile = mutation({
 export const trashFile = mutation({
   args: {
     fileId: v.id("files"),
-    orgId: v.id("organizations"),
+    teamId: v.id("teams"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -124,8 +123,8 @@ export const trashFile = mutation({
 
     const membership = await ctx.db
       .query("memberships")
-      .withIndex("by_userId_orgId", (q) =>
-        q.eq("userId", userId).eq("orgId", args.orgId),
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
       )
       .unique()
 
@@ -150,7 +149,7 @@ export const deleteTrashedFilesViaCron = internalMutation({
 
     const oldFiles = await ctx.db
       .query("files")
-      .withIndex("by_orgId_trashed")
+      .withIndex("by_teamId_trashed")
       .filter((f) =>
         f.and(
           f.eq(f.field("trashed"), true),

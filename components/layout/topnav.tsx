@@ -7,10 +7,10 @@ import { usePathname } from "next/navigation"
 import { buttonVariants } from "@/components/ui/button"
 
 const links = [
-  { title: "Files", url: "" },
-  { title: "Trash", url: "/trash" },
-  { title: "Favorites", url: "/favorites" },
-  { title: "Settings", url: "/settings" },
+  { label: "Files", url: "" },
+  { label: "Trash", url: "/trash" },
+  { label: "Favorites", url: "/favorites" },
+  { label: "Settings", url: "/settings" },
 ]
 
 export default function TopNav() {
@@ -18,11 +18,11 @@ export default function TopNav() {
   const underlineRef = useRef<HTMLSpanElement>(null)
 
   const pathname = usePathname()
-  const basePath = pathname.split("/").slice(0, 3).join("/") // /o/orgId
+  const basePath = pathname.split("/").slice(0, 3).join("/") // /t/teamId
 
   const isActive = (url: string) => {
     const target = url === "" ? basePath : `${basePath}${url}`
-    return pathname === target
+    return pathname.startsWith(target)
   }
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function TopNav() {
         {links.map((link) => (
           <Link
             prefetch
-            key={link.title}
+            key={link.label}
             href={`${basePath}${link.url}`}
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
@@ -71,7 +71,7 @@ export default function TopNav() {
               "relative duration-500",
             )}
           >
-            {link.title}
+            {link.label}
           </Link>
         ))}
       </nav>

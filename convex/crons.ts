@@ -5,7 +5,7 @@ const crons = cronJobs()
 
 crons.interval(
   "clear messages table",
-  { hours: 1 },
+  { hours: 6 },
   internal.files.deleteTrashedFilesViaCron,
 )
 

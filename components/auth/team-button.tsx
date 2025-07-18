@@ -21,23 +21,23 @@ import { useRouter } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { Check, ChevronsUpDown } from "lucide-react"
-import { useOrganization } from "@/hooks/use-organization"
-import CreateOrganizationButton from "./create-organization-button"
+import { useTeam } from "@/hooks/use-team"
+import CreateTeamButton from "./create-team-button"
 import { Skeleton } from "../ui/skeleton"
 
-export default function OrganizationButton() {
+export default function TeamButton() {
   const router = useRouter()
-  const { organization, loading } = useOrganization()
-  const organizations = useQuery(api.organizations.getUserOrganizations)
+  const { team, loading } = useTeam()
+  const userTeams = useQuery(api.teams.getUserTeams)
 
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState<string | null | undefined>(
-    loading ? undefined : (organization?.name ?? null),
+    loading ? undefined : (team?.name ?? null),
   )
 
   React.useEffect(() => {
-    if (organization) setValue(organization.name)
-  }, [organization])
+    if (team) setValue(team.name)
+  }, [team])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,14 +48,14 @@ export default function OrganizationButton() {
           aria-expanded={open}
           className="min-w-[200px] justify-start px-1.5"
         >
-          {value && <Avatar name={organization?.name ?? undefined} />}
+          {value && <Avatar name={team?.name ?? undefined} />}
           {value === undefined ? (
             <Skeleton className="h-full w-full" />
           ) : (
             <span className="w-full justify-between flex items-center gap-1.5">
               {value
-                ? organizations?.find((org) => org.name === value)?.name
-                : "Select organization..."}
+                ? userTeams?.find((team) => team.name === value)?.name
+                : "Select team..."}
               <ChevronsUpDown className="opacity-50" />
             </span>
           )}
@@ -63,30 +63,30 @@ export default function OrganizationButton() {
       </PopoverTrigger>
       <PopoverContent className="min-w-[150px] p-0">
         <Command>
-          <CommandInput placeholder="Search organizations..." className="h-9" />
+          <CommandInput placeholder="Search teams..." className="h-9" />
           <CommandList>
-            <CommandEmpty>No organizations found.</CommandEmpty>
+            <CommandEmpty>No teams found.</CommandEmpty>
             <CommandGroup>
-              {organizations?.map((org) => (
+              {userTeams?.map((team) => (
                 <CommandItem
-                  key={org._id}
-                  value={org.name}
+                  key={team._id}
+                  value={team.name}
                   onSelect={(selectedName) => {
                     setValue(selectedName === value ? "" : selectedName)
-                    const selectedOrg = organizations?.find(
-                      (o) => o.name === selectedName,
+                    const selectedTeam = userTeams?.find(
+                      (t) => t.name === selectedName,
                     )
-                    if (selectedOrg) {
-                      router.push(`/o/${selectedOrg._id}`)
+                    if (selectedTeam) {
+                      router.push(`/t/${selectedTeam._id}`)
                     }
                     setOpen(false)
                   }}
                 >
-                  {org.name}
+                  {team.name}
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === org.name ? "opacity-100" : "opacity-0",
+                      value === team.name ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>
@@ -95,7 +95,7 @@ export default function OrganizationButton() {
           </CommandList>
         </Command>
         <div className="grid px-1 pb-1">
-          <CreateOrganizationButton />
+          <CreateTeamButton />
         </div>
       </PopoverContent>
     </Popover>

@@ -3,21 +3,21 @@
 import { useQuery } from "convex/react"
 import { Skeleton } from "./ui/skeleton"
 import { api } from "@/convex/_generated/api"
-import { useOrganization } from "@/hooks/use-organization"
+import { useTeam } from "@/hooks/use-team"
 import { TrashIcon } from "@phosphor-icons/react"
 import FileItem from "./file-item"
 import { useSearchParams } from "next/navigation"
 
 export default function TrashedFileList() {
-  const { organization } = useOrganization()
-  const query = useSearchParams().get('q')
+  const { team } = useTeam()
+  const query = useSearchParams().get("q")
 
   const files = useQuery(
     api.files.getTrashedFiles,
-    organization
+    team
       ? {
-        orgId: organization._id,
-        searchQuery: query ? query : undefined
+          teamId: team._id,
+          searchQuery: query ? query : undefined,
         }
       : "skip",
   )
@@ -44,7 +44,7 @@ export default function TrashedFileList() {
         <div className="text-muted-foreground flex flex-col items-center justify-center h-full gap-2">
           <TrashIcon size={56} weight={"thin"} />
           <p className="text-sm text-muted-foreground text-center">
-            No trashed files {query ? 'found' : `in ${organization?.name}`}
+            No trashed files {query ? "found" : `in ${team?.name}`}
           </p>
         </div>
       )}
