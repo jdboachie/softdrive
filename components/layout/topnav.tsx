@@ -22,7 +22,7 @@ export default function TopNav() {
 
   const isActive = (url: string) => {
     const target = url === "" ? basePath : `${basePath}${url}`
-    return pathname.startsWith(target)
+    return url === "" ? pathname === target : pathname.startsWith(target)
   }
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function TopNav() {
       >
         <span
           ref={underlineRef}
-          className="z-10 absolute bottom-0 h-0.5 bg-primary rounded-full transition-all duration-150 ease-out"
+          className="pointer-events-none absolute bottom-0 left-0 h-0.5 bg-primary rounded-full transition-all duration-300 ease-out z-50"
         />
         {links.map((link) => (
           <Link

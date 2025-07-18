@@ -14,7 +14,7 @@ function Page() {
     router.push(`/t/${team._id}`)
   }, [team, router]);
 
-  return <Skeleton className="h-screen w-full" />
+  return <Skeleton className="h-screen w-full !rounded-none" />
 }
 
 export default Page

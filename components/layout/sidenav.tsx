@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { usePathname } from "next/navigation"
 import { LucideIcon } from "lucide-react"
 import { Icon } from "@phosphor-icons/react"
+import { usePathname } from "next/navigation"
 import { buttonVariants } from "@/components/ui/button"
 
 type NavLink = {
@@ -22,22 +22,18 @@ export function Sidenav({ links }: SidenavProps) {
 
   return (
     <nav className="md:w-full md:max-w-52 gap-px h-fit flex md:flex-col md:sticky md:top-38">
-      {links.map((link) => {
-        const segments = pathname.split("/") // ['', 't', 'team_abc', 'settings'...]
-        const teamId = segments[2] // team_abc
-
-        const actualUrl = link.url.replace(":teamId", teamId)
-        const isActive =
-          pathname === actualUrl || pathname.startsWith(actualUrl + "/")
+      {links.map((link: NavLink) => {
+        const teamId = pathname.split("/")[2]
+        const linkPath = link.url.replace(":teamId", teamId)
+        const isActive = pathname === linkPath
 
         return (
           <Link
             prefetch
             key={link.url}
-            href={actualUrl}
+            href={linkPath}
             className={cn(
               buttonVariants({
-                size: "default",
                 variant: isActive ? "secondary" : "ghost",
               }),
               "justify-start shadow-none",
