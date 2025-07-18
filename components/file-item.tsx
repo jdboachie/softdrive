@@ -131,11 +131,16 @@ export default function FileItem({
                     onClick={() => {
                       if (!team) return
                       toast.promise(
-                        restoreFile({ fileId: file._id, teamId: team._id})
+                        restoreFile({ fileId: file._id, teamId: team._id }),
+                        {
+                          loading: "Restoring file...",
+                          success: "Restored successfully",
+                          error: "Error restoring file",
+                        }
                       )
                     }}
                   >
-                    <ArrowCounterClockwiseIcon />
+                    <ArrowCounterClockwiseIcon weight="bold" />
                     Restore
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -148,14 +153,14 @@ export default function FileItem({
                           fileId: file._id,
                         }),
                         {
-                          loading: 'Deleting file...',
-                          success: 'Deleted successfully',
-                          error: 'Error deleting file'
-                        }
+                          loading: "Deleting file...",
+                          success: "Deleted successfully",
+                          error: "Error deleting file",
+                        },
                       )
                     }}
                   >
-                    <FileXIcon />
+                    <FileXIcon weight="bold" />
                     Delete permanently
                   </DropdownMenuItem>
                 </>
@@ -181,7 +186,7 @@ export default function FileItem({
                       a.target = "_blank"
                       a.download = file.name
                       a.click()
-                      toast.success("Download started")
+                      toast.info("Download started")
                     }}
                   >
                     <DownloadSimpleIcon weight="bold" />
@@ -189,6 +194,7 @@ export default function FileItem({
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
+                    variant="destructive"
                     onClick={() => {
                       if (!team) return
                       trashFile({ teamId: team._id, fileId: file._id })
