@@ -35,7 +35,7 @@ const formSchema = z.object({
 })
 
 export default function UploadButton() {
-  const { team } = useTeam()
+  const { team, loading } = useTeam()
   const createFile = useMutation(api.files.createFile)
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl)
 
@@ -92,6 +92,7 @@ export default function UploadButton() {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button
+          disabled={loading}
           onClick={() => {
             setDialogOpen(true)
           }}

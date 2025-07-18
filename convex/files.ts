@@ -63,14 +63,14 @@ export const getTrashedFiles = query({
     const files = await ctx.db
       .query("files")
       .withIndex("by_teamId_trashed", (q) =>
-        q.eq("teamId", args.teamId).eq("trashed", true)
+        q.eq("teamId", args.teamId).eq("trashed", true),
       )
       .collect()
 
     if (args.searchQuery?.trim()) {
       const searchLower = args.searchQuery.toLowerCase()
       return files.filter((file) =>
-        file.name?.toLowerCase().includes(searchLower)
+        file.name?.toLowerCase().includes(searchLower),
       )
     }
 
@@ -166,7 +166,8 @@ export const restoreFile = mutation({
       )
       .unique()
 
-    if (!membership || membership.role !== "admin") { // or write
+    if (!membership || membership.role !== "admin") {
+      // or write
       throw new Error("No permission to restore this file")
     }
 
@@ -196,13 +197,14 @@ export const deleteFilePermanently = mutation({
       )
       .unique()
 
-    if (!membership || membership.role !== "admin") { // or write
+    if (!membership || membership.role !== "admin") {
+      // or write
       throw new Error("No permission to delete this file")
     }
 
     await ctx.storage.delete(file.storageId)
     await ctx.db.delete(file._id)
-  }
+  },
 })
 
 export const deleteTrashedFilesViaCron = internalMutation({
@@ -221,6 +223,36 @@ export const deleteTrashedFilesViaCron = internalMutation({
       .collect()
 
     for (const file of oldFiles) {
+      console.info(`Deleting ${file.name}`)
+      await ctx.db.delete(file._id)
+      await ctx.storage.delete(file.storageId)
+    }
+  },
+})
+
+export const deleteAllTrashedFiles = mutation({
+  args: { teamId: v.id("teams") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
+      )
+      .unique()
+    if (!membership || membership.role !== "admin") { // or write
+      throw new Error("No permission to empty trash")
+    }
+
+    const trashedFiles = await ctx.db
+      .query("files")
+      .withIndex("by_teamId_trashed")
+      .filter((f) => f.eq(f.field("trashed"), true))
+      .collect()
+
+    for (const file of trashedFiles) {
       console.info(`Deleting ${file.name}`)
       await ctx.db.delete(file._id)
       await ctx.storage.delete(file.storageId)
