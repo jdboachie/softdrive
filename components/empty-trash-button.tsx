@@ -16,6 +16,7 @@ import { TrashIcon } from "@phosphor-icons/react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useTeam } from "@/hooks/use-team"
+import { toast } from "sonner"
 
 export default function EmptyTrashButton() {
   const { team, loading } = useTeam()
@@ -32,7 +33,8 @@ export default function EmptyTrashButton() {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete all trashed files from our servers.
+            This action cannot be undone. This will permanently delete all
+            trashed files from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -40,9 +42,15 @@ export default function EmptyTrashButton() {
           <AlertDialogAction
             onClick={async () => {
               if (!team) return
-              await emptyTrash({ teamId: team._id })
+              toast.promise(emptyTrash({ teamId: team._id }), {
+                loading: "Emptying trash...",
+                success: "Trash emptied successfully",
+                error: "Error emptying trash",
+              })
             }}
-          >Empty trash</AlertDialogAction>
+          >
+            Empty trash
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
