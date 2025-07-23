@@ -1,9 +1,10 @@
 "use client"
 
-import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect } from "react"
 import { useTeam } from "@/hooks/use-team"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { HeaderSkeleton } from "@/components/layout/header"
+import { TitleBlockSkeleton } from "@/components/layout/title-block"
 
 function Page() {
   const router = useRouter()
@@ -14,7 +15,12 @@ function Page() {
     router.push(`/t/${team._id}`)
   }, [team, router]);
 
-  return <Skeleton className="h-screen w-full !rounded-none" />
+  return(
+    <>
+      <HeaderSkeleton />
+      <TitleBlockSkeleton />
+    </>
+  )
 }
 
 export default Page

@@ -62,7 +62,7 @@ export default function RootLayout({
                   richColors
                   toastOptions={{
                     style: {
-                      borderRadius: 'calc(var(--radius) + 7px)'
+                      borderRadius: 'calc(var(--radius) + 6px)'
                     }
                   }}
                 />

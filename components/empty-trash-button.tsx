@@ -31,7 +31,7 @@ export default function EmptyTrashButton() {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>Delete forever?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete all
             trashed files from our servers.

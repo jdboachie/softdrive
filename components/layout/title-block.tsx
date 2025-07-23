@@ -1,3 +1,4 @@
+import { Skeleton } from "../ui/skeleton"
 import Breadcrumbs from "./breadcrumbs"
 
 export default function TitleBlock({
@@ -6,13 +7,30 @@ export default function TitleBlock({
 }: {
   title?: string
   children?: React.ReactNode
-  }) {
+}) {
   return (
     <div className="border-b">
       <div className="flex items-center justify-between p-6 containor mx-auto">
-        {title && <h1 className="text-3xl font-medium">{title}</h1>}
-        <Breadcrumbs />
+        {title ? (
+          <h1 className="text-3xl font-medium">{title}</h1>
+        ) : (
+          <Breadcrumbs />
+        )}
         {children && children}
+      </div>
+    </div>
+  )
+}
+
+export function TitleBlockSkeleton() {
+  return (
+    <div className="border-b">
+      <div className="flex items-center justify-between p-6 containor mx-auto">
+        <Skeleton className="h-9 w-56" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-9 w-32" />
+        </div>
       </div>
     </div>
   )

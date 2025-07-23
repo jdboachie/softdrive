@@ -50,7 +50,7 @@
 :root {
   --ground: oklch(0.985 0 0);
   --skeleton: oklch(0.92 0.004 286.32);
-  --skeleton-end: oklch(0.85 0 0);
+  --skeleton-end: oklch(0.83 0 0);
   --success: var(--color-green-500);
   --brand: oklch(0.623 0.214 259.815);
   --highlight: oklch(0.852 0.199 91.936)
@@ -59,7 +59,7 @@
 .dark {
   --ground: oklch(0 0 0);
   --skeleton: oklch(0.22 0 0);
-  --skeleton-end: oklch(0.18 0 0);
+  --skeleton-end: oklch(0.17 0 0);
   --brand: oklch(0.707 0.165 254.624);
   --highlight: oklch(0.852 0.199 91.936);
 }

@@ -5,8 +5,11 @@ import { SignInButton } from "@/components/auth/signin"
 export default function SignIn() {
 
   return (
-    <div className="flex flex-col gap-8 w-96 mx-auto h-screen justify-center items-center">
-      <SignInButton />
+    <div className="grid place-items-center h-screen">
+      <div className="grid place-items-center gap-2">
+        <h3 className="text-xl font-semibold">Welcome back</h3>
+        <SignInButton />
+      </div>
     </div>
   )
 }
