@@ -4,6 +4,7 @@ import { TabsIcon } from "@phosphor-icons/react/dist/ssr"
 import TeamButton from "@/components/auth/team-button"
 import TopNav from "./topnav"
 import { Skeleton } from "@/components/ui/skeleton"
+import FileSearch from "../file-search"
 
 export default function Header() {
   return (
@@ -15,6 +16,7 @@ export default function Header() {
           <TeamButton />
         </div>
         <div className="flex items-center w-fit gap-2">
+          <FileSearch />
           <UserButton />
         </div>
       </div>

@@ -26,7 +26,8 @@ import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTeam } from "@/hooks/use-team"
-import { FileIcon, UploadIcon } from "@phosphor-icons/react"
+import { UploadIcon } from "@phosphor-icons/react"
+import { renderFileIcon } from "./file-item"
 
 const formSchema = z.object({
   files: z
@@ -93,25 +94,28 @@ export default function UploadButton() {
       <DialogTrigger asChild>
         <Button
           disabled={loading}
+          size={'lg'}
           onClick={() => {
             setDialogOpen(true)
           }}
         >
-          <UploadIcon weight="bold" size={32} />
+          <UploadIcon weight="bold" size={32} className="size-5" />
           Upload files
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Upload file</DialogTitle>
+        <DialogHeader className="border-b-0">
+          <DialogTitle>Upload files</DialogTitle>
           <DialogDescription>
-            Add files to{" "}
-            <span className="font-medium">{team?.name}&apos;s</span> drive
+            Add files to {team?.name}&apos;s drive
           </DialogDescription>
         </DialogHeader>
-        <div className="p-5">
+        <div className="p-5 mb-5">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-5"
+            >
               <FormField
                 control={form.control}
                 name="files"
@@ -137,7 +141,7 @@ export default function UploadButton() {
                             ])
                           }
                         }}
-                        className="border border-dashed max-h-72 min-h-32 pjustify-center overflow-auto rounded-lg bg-accent/15 p-3 flex flex-col gap-3"
+                        className="border border-dashed max-h-72 min-h-32 pustify-center overflow-auto rounded-lg bg-accent/15 p-3 flex flex-col gap-3"
                       >
                         <Input
                           ref={inputRef}
@@ -162,7 +166,7 @@ export default function UploadButton() {
                                 key={idx}
                                 className="border flex items-center gap-2 rounded-sm p-2 h-10 bg-card"
                               >
-                                <FileIcon />
+                                {renderFileIcon(file.type)}
                                 <span className="text-sm truncate">
                                   {file.name}
                                 </span>

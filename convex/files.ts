@@ -1,6 +1,7 @@
 import { v } from "convex/values"
-import { internalMutation, mutation, query } from "./_generated/server"
 import { getAuthUserId } from "@convex-dev/auth/server"
+import { paginationOptsValidator } from "convex/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 
 export const getFiles = query({
   args: {
@@ -37,6 +38,25 @@ export const getFiles = query({
     return files.filter((file) =>
       file.name?.toLowerCase().includes(searchLower),
     )
+  },
+})
+
+export const getFilesPaginated = query({
+  args: {
+    teamId: v.id("teams"),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+
+    const pagination = await ctx.db
+      .query("files")
+      .withIndex("by_teamId_trashed", (q) =>
+        q.eq("teamId", args.teamId).eq("trashed", false),
+      )
+      .order("desc")
+      .paginate(args.paginationOpts)
+
+    return pagination
   },
 })
 
@@ -109,6 +129,35 @@ export const createFile = mutation({
       teamId: args.teamId,
       trashed: false,
       storageId: args.storageId,
+    })
+  },
+})
+
+export const toggleFileFavorite = mutation({
+  args: {
+    fileId: v.id("files"),
+    teamId: v.id("teams"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
+
+    const file = await ctx.db.get(args.fileId)
+    if (!file) throw new Error("File not found")
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
+      )
+      .unique()
+
+    if (!membership || membership.role === "read") {
+      throw new Error("No permission to toggle favorite")
+    }
+
+    await ctx.db.patch(args.fileId, {
+      favorite: !file.favorite,
     })
   },
 })

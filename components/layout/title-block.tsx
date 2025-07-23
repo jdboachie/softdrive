@@ -29,7 +29,6 @@ export function TitleBlockSkeleton() {
         <Skeleton className="h-9 w-56" />
         <div className="flex items-center gap-2">
           <Skeleton className="h-9 w-32" />
-          <Skeleton className="h-9 w-32" />
         </div>
       </div>
     </div>

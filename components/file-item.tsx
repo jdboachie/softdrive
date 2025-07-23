@@ -25,75 +25,48 @@ import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
 import { useTeam } from "@/hooks/use-team"
 import { Doc } from "@/convex/_generated/dataModel"
-import { formatBytes } from "@/lib/utils"
+import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import UserImage from "./user-image"
+
+export function renderFileIcon(type: string) {
+  if (!type) return <div className="size-5 bg-accent rounded-sm" />
+
+  if (type === "application/pdf")
+    return <FilePdfIcon size={32} className="size-5" />
+
+  if (type === "text/csv")
+    return <FileCsvIcon size={32} className="size-5" />
+
+  if (type === "application/json")
+    return <BracketsCurlyIcon size={32} className="size-5" />
+
+  if (type  === "image/jpeg" || type === "image/png")
+    return <ImageSquareIcon size={32} className="size-5" />
+
+  if (
+    type ===
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+    return (
+      <MicrosoftWordLogoIcon
+        size={32}
+        weight="fill"
+        className="size-5 text-blue-500"
+      />
+    )
+
+  return <div className="size-5 rounded-sm bg-accent" />
+}
 
 export default function FileItem({
   file,
-  trash,
   // view = "list",
 }: {
   file: Doc<"files">
   trash?: boolean
   // view?: "grid" | "list"
 }) {
-  const { team } = useTeam()
-  const trashFile = useMutation(api.files.trashFile)
-  const restoreFile = useMutation(api.files.restoreFile)
-  const deleteFilePermanently = useMutation(api.files.deleteFilePermanently)
   const author = useQuery(api.users.getUserById, { userId: file.author })
-  const fileUrl = useQuery(api.storage.getFileUrl, { src: file.storageId })
-
-  const renderFileIcon = () => {
-    const type = file.type
-
-    if (!type) return <div className="size-5 bg-accent rounded-sm" />
-
-    if (type === "application/pdf")
-      return (
-        <FilePdfIcon size={32} weight="fill" className="size-5 text-red-500" />
-      )
-
-    if (type === "text/csv") return <FileCsvIcon size={32} className="size-5" />
-
-    if (type === "application/json")
-      return <BracketsCurlyIcon size={32} className="size-5" />
-
-    if (type === "image/jpeg")
-      return <ImageSquareIcon size={32} className="size-5" />
-
-    if (
-      type ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    )
-      return (
-        <MicrosoftWordLogoIcon
-          size={32}
-          weight="fill"
-          className="size-5 text-blue-500"
-        />
-      )
-
-    return <div className="size-5 rounded-sm bg-accent" />
-  }
-
-  function formatRelativeDate(timestamp: number) {
-    // const now = new Date()
-    const date = new Date(timestamp)
-    // const diffDays = Math.floor(
-    //   (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-    // )
-
-    // if (diffDays === 0) return "Today"
-    // if (diffDays === 1) return "Yesterday"
-    // if (diffDays === 2) return "Two days ago"
-
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
 
   return (
     <>
@@ -101,7 +74,7 @@ export default function FileItem({
         className={`justify-between flex items-center p-2 h-11 rounded-sm odd:bg-accent/70 odd:dark:bg-accent/30 even:bg-transparent hover:bg-neutral-200 dark:hover:bg-accent/70 transition-all duration-150 ease-in-out`}
       >
         <div className="flex items-center gap-2">
-          {renderFileIcon()}
+          {renderFileIcon(file.type)}
           <span className="truncate min-w-0 text-sm font-medium">
             {file.name}
           </span>
@@ -114,104 +87,119 @@ export default function FileItem({
           <span className="text-xs">
             {formatRelativeDate(file._creationTime)}
           </span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size={"icon"} variant={"ghost"} className="!size-6">
-                <DotsThreeIcon
-                  weight="bold"
-                  className="size-4 text-foreground"
-                />
-                <span className="sr-only">Options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {trash ? (
-                <>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      if (!team) return
-                      toast.promise(
-                        restoreFile({ fileId: file._id, teamId: team._id }),
-                        {
-                          loading: "Restoring file...",
-                          success: "Restored successfully",
-                          error: "Error restoring file",
-                        }
-                      )
-                    }}
-                  >
-                    <ArrowCounterClockwiseIcon weight="bold" />
-                    Restore
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => {
-                      if (!team) return
-                      toast.promise(
-                        deleteFilePermanently({
-                          teamId: team._id,
-                          fileId: file._id,
-                        }),
-                        {
-                          loading: "Deleting file...",
-                          success: "Deleted successfully",
-                          error: "Error deleting file",
-                        },
-                      )
-                    }}
-                  >
-                    <FileXIcon weight="bold" />
-                    Delete permanently
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <>
-                  <DropdownMenuCheckboxItem
-                    checked={file.favorite}
-                    onClick={() => {
-                      // toggle favorite
-                    }}
-                  >
-                    Favorite
-                  </DropdownMenuCheckboxItem>
-
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      if (!fileUrl) {
-                        toast.error("Could not download file")
-                        return
-                      }
-                      const a = document.createElement("a")
-                      a.href = fileUrl
-                      a.target = "_blank"
-                      a.download = file.name
-                      a.click()
-                      toast.info("Download started")
-                    }}
-                  >
-                    <DownloadSimpleIcon weight="bold" />
-                    Download file
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => {
-                      if (!team) return
-                      trashFile({ teamId: team._id, fileId: file._id })
-                      toast.info("File moved to trash", {
-                        description: `${file.name} has been moved to trash successfully.`,
-                      })
-                    }}
-                  >
-                    <TrashIcon weight="bold" />
-                    Move to trash
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </li>
     </>
+  )
+}
+
+export const FileActions = ({ file }: { file: Doc<"files"> }) => {
+  const { team, loading } = useTeam()
+  const toggleFileFavorite = useMutation(api.files.toggleFileFavorite)
+  const trashFile = useMutation(api.files.trashFile)
+  const restoreFile = useMutation(api.files.restoreFile)
+  const deleteFilePermanently = useMutation(api.files.deleteFilePermanently)
+  const fileUrl = useQuery(api.storage.getFileUrl, { src: file.storageId })
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          disabled={loading}
+          size={"icon"}
+          variant={"ghost"}
+          className="!size-7"
+        >
+          <DotsThreeIcon weight="bold" className="size-4 text-foreground" />
+          <span className="sr-only">Options</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {file.trashedAt ? (
+          <>
+            <DropdownMenuItem
+              onClick={() => {
+                if (!team) return
+                toast.promise(
+                  restoreFile({ fileId: file._id, teamId: team._id }),
+                  {
+                    loading: "Restoring file...",
+                    success: "Restored successfully",
+                    error: "Error restoring file",
+                  },
+                )
+              }}
+            >
+              <ArrowCounterClockwiseIcon weight="bold" />
+              Restore
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => {
+                if (!team) return
+                toast.promise(
+                  deleteFilePermanently({
+                    teamId: team._id,
+                    fileId: file._id,
+                  }),
+                  {
+                    loading: "Deleting file...",
+                    success: "Deleted successfully",
+                    error: "Error deleting file",
+                  },
+                )
+              }}
+            >
+              <FileXIcon weight="bold" />
+              Delete permanently
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuCheckboxItem
+              checked={file.favorite}
+              onClick={() => {
+                if (!team) return
+                toggleFileFavorite({ teamId: team._id, fileId: file._id })
+              }}
+            >
+                {file.favorite ? 'Remove' : 'Add'}{" "}favorite
+            </DropdownMenuCheckboxItem>
+
+            <DropdownMenuItem
+              onClick={async () => {
+                if (!fileUrl) {
+                  toast.error("Could not download file")
+                  return
+                }
+                const a = document.createElement("a")
+                a.href = fileUrl
+                a.target = "_blank"
+                a.download = file.name
+                a.click()
+                toast.info("Download started")
+              }}
+            >
+              <DownloadSimpleIcon weight="bold" />
+              Download file
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => {
+                if (!team) return
+                trashFile({ teamId: team._id, fileId: file._id })
+                toast.info("File moved to trash", {
+                  description: `${file.name} has been moved to trash successfully.`,
+                })
+              }}
+            >
+              <TrashIcon weight="bold" />
+              Move to trash
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

@@ -53,7 +53,7 @@ export default function TopNav() {
     <div className="containor mx-auto">
       <nav
         ref={containerRef}
-        className="relative flex p-2 overflow-x-scroll hidden-scrollbar"
+        className="relative flex p-2 overflow-x-auto hidden-scrollbar"
       >
         <span
           ref={underlineRef}
