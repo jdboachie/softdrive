@@ -27,6 +27,7 @@ import { useTeam } from "@/hooks/use-team"
 import { Doc } from "@/convex/_generated/dataModel"
 import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import UserImage from "./user-image"
+import { ConvexError } from "convex/values"
 
 export function renderFileIcon(type: string) {
   if (!type) return <div className="size-5 bg-accent rounded-sm" />
@@ -34,13 +35,12 @@ export function renderFileIcon(type: string) {
   if (type === "application/pdf")
     return <FilePdfIcon size={32} className="size-5" />
 
-  if (type === "text/csv")
-    return <FileCsvIcon size={32} className="size-5" />
+  if (type === "text/csv") return <FileCsvIcon size={32} className="size-5" />
 
   if (type === "application/json")
     return <BracketsCurlyIcon size={32} className="size-5" />
 
-  if (type  === "image/jpeg" || type === "image/png")
+  if (type === "image/jpeg" || type === "image/png")
     return <ImageSquareIcon size={32} className="size-5" />
 
   if (
@@ -163,7 +163,7 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
                 toggleFileFavorite({ teamId: team._id, fileId: file._id })
               }}
             >
-                {file.favorite ? 'Remove' : 'Add'}{" "}favorite
+              {file.favorite ? "Remove" : "Add"} favorite
             </DropdownMenuCheckboxItem>
 
             <DropdownMenuItem
@@ -188,10 +188,21 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
               variant="destructive"
               onClick={() => {
                 if (!team) return
-                trashFile({ teamId: team._id, fileId: file._id })
-                toast.info("File moved to trash", {
-                  description: `${file.name} has been moved to trash successfully.`,
-                })
+
+                toast.promise(
+                  trashFile({ teamId: team._id, fileId: file._id }).catch(
+                    (err: Error) => {
+                      toast.error(err.name, {
+                        description:
+                          "You may not have permission to delete this file",
+                      })
+                    },
+                  ),
+                  {
+                    loading: "Moving to trash...",
+                    success: "File trashed successfully",
+                  },
+                )
               }}
             >
               <TrashIcon weight="bold" />

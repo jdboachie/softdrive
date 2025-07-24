@@ -11,6 +11,7 @@ import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useTeam } from "@/hooks/use-team"
 import { DataTableColumnHeader } from "./data-table-column-header"
+import { useState } from "react"
 
 export const columns: ColumnDef<Doc<"files">>[] = [
   {
@@ -111,17 +112,20 @@ function FavoriteButton({
   favorite: boolean
 }) {
   const { team, loading } = useTeam()
+  const [pending, setPending] = useState<boolean>()
   const toggleFileFavorite = useMutation(api.files.toggleFileFavorite)
 
   return (
     <Button
-      disabled={loading}
+      disabled={loading || pending}
       variant={"ghost"}
       size={"icon"}
       className="size-7"
-      onClick={() => {
+      onClick={async () => {
         if (!team) return
-        toggleFileFavorite({ teamId: team._id, fileId: fileId })
+        setPending(true)
+        await toggleFileFavorite({ teamId: team._id, fileId: fileId })
+        setPending(false)
       }}
     >
       <StarIcon weight={favorite ? "fill" : "regular"} />

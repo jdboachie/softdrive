@@ -15,7 +15,7 @@ import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import UserImage from "../user-image"
 import { Skeleton } from "../ui/skeleton"
-import { GearFineIcon } from "@phosphor-icons/react"
+import { GearFineIcon, UserIcon } from "@phosphor-icons/react"
 
 
 export default function UserButton() {
@@ -34,9 +34,9 @@ export default function UserButton() {
         <DropdownMenuLabel className="pt-0 text-muted-foreground font-normal">{user?.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem><UserIcon weight='bold' /> Profile</DropdownMenuItem>
           <DropdownMenuItem><GearFineIcon weight='bold' />Settings</DropdownMenuItem>
-          <DropdownMenuItem variant="destructive"> <SignOutButton /></DropdownMenuItem>
+          <DropdownMenuItem><SignOutButton /></DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

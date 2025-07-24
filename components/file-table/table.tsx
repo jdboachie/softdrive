@@ -18,7 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ColumnVisibilityButton } from "./column-visibility-button"
+// import { ColumnVisibilityButton } from "./column-visibility-button"
+// import FileSearch from "../file-search"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -51,9 +52,9 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center">
-        <ColumnVisibilityButton table={table} />
-      </div>
+      {/* <div className="flex items-center">
+
+      </div> */}
       <div className="overflow-hidden rounded-sm border bg-background">
         <Table>
           <TableHeader>
