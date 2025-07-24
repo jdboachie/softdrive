@@ -14,29 +14,19 @@ export default function FileSearch({ placeholder }: { placeholder?: string }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSearch = useDebouncedCallback(() => {
-    router.push  (`?q=${inputRef.current?.value}`)
+    router.push(`?q=${inputRef.current?.value}`)
   }, 500)
 
   return (
-    <>
-      <div className="max-w-md relative rounded-md max-sm:huidden bg-background">
-        <MagnifyingGlassIcon className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-        <Input
-          type="search"
-          className="!px-8"
-          placeholder={placeholder ?? "Search files..."}
-          ref={inputRef}
-          onChange={handleSearch}
-          defaultValue={searchQuery ?? undefined}
-        />
-      </div>
-      {/* <Button
-        size={"icon"}
-        variant={"outline"}
-        className="sm:hidden shadow-none rounded-full bg-transparent"
-      >
-        <MagnifyingGlassIcon />
-      </Button> */}
-    </>
+    <div className="max-w-md relative rounded-md bg-background">
+      <MagnifyingGlassIcon className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+      <Input
+        className="!px-8 !bg-transparent"
+        placeholder={placeholder ?? "Search files..."}
+        ref={inputRef}
+        onChange={handleSearch}
+        defaultValue={searchQuery ?? undefined}
+      />
+    </div>
   )
 }

@@ -2,10 +2,19 @@ import { v } from "convex/values"
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { paginationOptsValidator } from "convex/server"
 import { internalMutation, mutation, query } from "./_generated/server"
+import { Id } from "./_generated/dataModel"
+
+export const getFileById = query({
+  args: { id: v.id("files") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id)
+  },
+})
 
 export const getFiles = query({
   args: {
     teamId: v.id("teams"),
+    parentId: v.optional(v.id("files")),
     searchQuery: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -25,19 +34,34 @@ export const getFiles = query({
 
     const files = await ctx.db
       .query("files")
-      .withIndex("by_teamId_trashed", (q) =>
-        q.eq("teamId", args.teamId).eq("trashed", false),
+      .withIndex("by_teamId_parentId_trashed", (q) =>
+        q
+          .eq("teamId", args.teamId)
+          .eq("parentId", args.parentId)
+          .eq("trashed", false),
       )
       .order("desc")
       .collect()
 
-    if (!args.searchQuery) return files
+    if (!args.searchQuery) {
+      return files.sort((a, b) => {
+        if (a.isFolder !== b.isFolder) {
+          return a.isFolder ? -1 : 1
+        }
+        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0)
+      })
+    }
 
     const searchLower = args.searchQuery.toLowerCase()
 
-    return files.filter((file) =>
-      file.name?.toLowerCase().includes(searchLower),
-    )
+    return files
+      .filter((file) => file.name?.toLowerCase().includes(searchLower))
+      .sort((a, b) => {
+        if (a.isFolder !== b.isFolder) {
+          return a.isFolder ? -1 : 1 // folders first
+        }
+        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0) // newest first
+      })
   },
 })
 
@@ -47,7 +71,6 @@ export const getFilesPaginated = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-
     const pagination = await ctx.db
       .query("files")
       .withIndex("by_teamId_trashed", (q) =>
@@ -63,6 +86,7 @@ export const getFilesPaginated = query({
 export const getTrashedFiles = query({
   args: {
     teamId: v.id("teams"),
+    parentId: v.optional(v.id("files")),
     searchQuery: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -82,8 +106,11 @@ export const getTrashedFiles = query({
 
     const files = await ctx.db
       .query("files")
-      .withIndex("by_teamId_trashed", (q) =>
-        q.eq("teamId", args.teamId).eq("trashed", true),
+      .withIndex("by_teamId_parentId_trashed", (q) =>
+        q
+          .eq("teamId", args.teamId)
+          .eq("parentId", args.parentId)
+          .eq("trashed", true),
       )
       .collect()
 
@@ -103,8 +130,11 @@ export const createFile = mutation({
     name: v.string(),
     size: v.number(),
     type: v.string(),
+    path: v.string(),
     teamId: v.id("teams"),
-    storageId: v.id("_storage"),
+    storageId: v.optional(v.id("_storage")),
+    isFolder: v.optional(v.boolean()),
+    parentId: v.optional(v.id("files")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -121,11 +151,18 @@ export const createFile = mutation({
       throw new Error("User does not have access to this team")
     }
 
-    await ctx.db.insert("files", {
+    if (!args.isFolder && !args.storageId) {
+      throw new Error("Storage ID is required for files")
+    }
+
+    return await ctx.db.insert("files", {
       name: args.name,
       type: args.type,
       size: args.size,
-      author: userId,
+      path: args.path,
+      isFolder: args.isFolder ?? false,
+      parentId: args.parentId,
+      authorId: userId,
       teamId: args.teamId,
       trashed: false,
       storageId: args.storageId,
@@ -133,7 +170,7 @@ export const createFile = mutation({
   },
 })
 
-export const toggleFileFavorite = mutation({
+export const toggleFileIsStarred = mutation({
   args: {
     fileId: v.id("files"),
     teamId: v.id("teams"),
@@ -153,11 +190,11 @@ export const toggleFileFavorite = mutation({
       .unique()
 
     if (!membership || membership.role === "read") {
-      throw new Error("No permission to toggle favorite")
+      throw new Error("No permission to toggle star")
     }
 
     await ctx.db.patch(args.fileId, {
-      favorite: !file.favorite,
+      isStarred: !file.isStarred,
     })
   },
 })
@@ -193,6 +230,33 @@ export const trashFile = mutation({
       trashed: true,
       trashedAt: Date.now(),
     })
+  },
+})
+
+export const trashFolder = mutation({
+  args: { fileId: v.id("files"), teamId: v.id("teams") },
+  handler: async (ctx, args) => {
+    const now = Date.now()
+
+    async function trashRecursive(fileId: Id<"files">, teamId: Id<"teams">) {
+      await ctx.db.patch(fileId, {
+        trashed: true,
+        trashedAt: now,
+      })
+
+      const children = await ctx.db
+        .query("files")
+        .withIndex("by_teamId_parentId_trashed", (q) =>
+          q.eq("teamId", teamId).eq("parentId", fileId),
+        )
+        .collect()
+
+      for (const child of children) {
+        await trashRecursive(child._id, teamId)
+      }
+    }
+
+    await trashRecursive(args.fileId, args.teamId)
   },
 })
 
@@ -251,7 +315,7 @@ export const deleteFilePermanently = mutation({
       throw new Error("No permission to delete this file")
     }
 
-    await ctx.storage.delete(file.storageId)
+    if (file.storageId) await ctx.storage.delete(file.storageId)
     await ctx.db.delete(file._id)
   },
 })
@@ -274,7 +338,7 @@ export const deleteTrashedFilesViaCron = internalMutation({
     for (const file of oldFiles) {
       console.info(`Deleting ${file.name}`)
       await ctx.db.delete(file._id)
-      await ctx.storage.delete(file.storageId)
+      if (file.storageId) await ctx.storage.delete(file.storageId)
     }
   },
 })
@@ -291,7 +355,8 @@ export const deleteAllTrashedFiles = mutation({
         q.eq("userId", userId).eq("teamId", args.teamId),
       )
       .unique()
-    if (!membership || membership.role !== "admin") { // or write
+    if (!membership || membership.role !== "admin") {
+      // or write
       throw new Error("No permission to empty trash")
     }
 
@@ -304,7 +369,7 @@ export const deleteAllTrashedFiles = mutation({
     for (const file of trashedFiles) {
       console.info(`Deleting ${file.name}`)
       await ctx.db.delete(file._id)
-      await ctx.storage.delete(file.storageId)
+      if (file.storageId) await ctx.storage.delete(file.storageId)
     }
   },
 })

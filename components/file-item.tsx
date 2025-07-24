@@ -3,6 +3,7 @@
 import {
   ArrowCounterClockwiseIcon,
   BracketsCurlyIcon,
+  CopyIcon,
   DotsThreeIcon,
   DownloadSimpleIcon,
   FileCsvIcon,
@@ -32,15 +33,16 @@ export function renderFileIcon(type: string) {
   if (!type) return <div className="size-5 bg-accent rounded-sm" />
 
   if (type === "application/pdf")
-    return <FilePdfIcon size={32} className="size-5" />
+    return <FilePdfIcon size={32} className="size-5 min-w-5" />
 
-  if (type === "text/csv") return <FileCsvIcon size={32} className="size-5" />
+  if (type === "text/csv")
+    return <FileCsvIcon size={32} className="size-5 min-w-5" />
 
   if (type === "application/json")
-    return <BracketsCurlyIcon size={32} className="size-5" />
+    return <BracketsCurlyIcon size={32} className="size-5 min-w-5" />
 
   if (type === "image/jpeg" || type === "image/png")
-    return <ImageSquareIcon size={32} className="size-5" />
+    return <ImageSquareIcon size={32} className="size-5 min-w-5" />
 
   if (
     type ===
@@ -50,7 +52,7 @@ export function renderFileIcon(type: string) {
       <MicrosoftWordLogoIcon
         size={32}
         weight="fill"
-        className="size-5 text-blue-500"
+        className="size-5 min-w-5 text-blue-500"
       />
     )
 
@@ -65,7 +67,7 @@ export default function FileItem({
   trash?: boolean
   // view?: "grid" | "list"
 }) {
-  const author = useQuery(api.users.getUserById, { userId: file.author })
+  const author = useQuery(api.users.getUserById, { userId: file.authorId })
 
   return (
     <>
@@ -79,7 +81,9 @@ export default function FileItem({
           </span>
         </div>
         <div className="flex items-center justify-between gap-4 w-fit h-full max-md:hidden">
-          <p className="text-xs">{file && formatBytes(file.size)}</p>
+          <p className="text-xs">
+            {file && !file.isFolder && file.size && formatBytes(file.size)}
+          </p>
           <div className="size-5 border rounded-full">
             <UserImage src={author?.image} />
           </div>
@@ -94,11 +98,17 @@ export default function FileItem({
 
 export const FileActions = ({ file }: { file: Doc<"files"> }) => {
   const { team, loading } = useTeam()
-  const toggleFileFavorite = useMutation(api.files.toggleFileFavorite)
+
   const trashFile = useMutation(api.files.trashFile)
+  const trashFolder = useMutation(api.files.trashFolder)
   const restoreFile = useMutation(api.files.restoreFile)
+  const toggleFileFavorite = useMutation(api.files.toggleFileIsStarred)
   const deleteFilePermanently = useMutation(api.files.deleteFilePermanently)
-  const fileUrl = useQuery(api.storage.getFileUrl, { src: file.storageId })
+
+  const fileUrl = useQuery(
+    api.storage.getFileUrl,
+    file.isFolder || !file.storageId ? "skip" : { src: file.storageId },
+  )
 
   return (
     <DropdownMenu>
@@ -114,6 +124,19 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={async () => {
+            if (!fileUrl) {
+              toast.error("Could not get file url")
+              return
+            }
+            await navigator.clipboard.writeText(fileUrl)
+            toast.success("Link copied to clipboard")
+          }}
+        >
+          <CopyIcon weight="bold" />
+          Copy link
+        </DropdownMenuItem>
         {file.trashedAt ? (
           <>
             <DropdownMenuItem
@@ -156,13 +179,13 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
         ) : (
           <>
             <DropdownMenuCheckboxItem
-              checked={file.favorite}
+              checked={file.isStarred}
               onClick={() => {
                 if (!team) return
                 toggleFileFavorite({ teamId: team._id, fileId: file._id })
               }}
             >
-              {file.favorite ? "Remove" : "Add"} favorite
+              {file.isStarred ? "Unstar" : "Star"}
             </DropdownMenuCheckboxItem>
 
             <DropdownMenuItem
@@ -189,14 +212,27 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
                 if (!team) return
 
                 toast.promise(
-                  trashFile({ teamId: team._id, fileId: file._id }).catch(
-                    (err: Error) => {
-                      toast.error(err.name, {
-                        description:
-                          "You may not have permission to delete this file",
-                      })
-                    },
-                  ),
+                  async () => {
+                    if (file.isFolder) {
+                      trashFolder({ teamId: team._id, fileId: file._id }).catch(
+                        (err: Error) => {
+                          toast.error(err.name, {
+                            description:
+                              "You may not have permission to delete this file",
+                          })
+                        },
+                      )
+                    } else {
+                      trashFile({ teamId: team._id, fileId: file._id }).catch(
+                        (err: Error) => {
+                          toast.error(err.name, {
+                            description:
+                              "You may not have permission to delete this file",
+                          })
+                        },
+                      )
+                    }
+                  },
                   {
                     loading: "Moving to trash...",
                     success: "File trashed successfully",

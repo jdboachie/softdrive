@@ -10,6 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ColumnVisibilityButton } from "./column-visibility-button"
 
 interface DataTableProps<TData, TValue> {
@@ -75,7 +76,7 @@ export function DataTable<TData, TValue>({
                   const key = header.column.id
                   const className = getColumnClass(key)
                   return (
-                    <div key={header.id} className={className + ""}>
+                    <div key={header.id} className={className}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -120,5 +121,53 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
     </>
+  )
+}
+
+export function DataTableSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-sm">
+      <div className="flex flex-col divide-y text-sm rounded-sm">
+        {/* Header Skeleton */}
+        <div className="flex h-10 text-muted-foreground font-medium">
+          <div className="w-10 flex items-center justify-center">
+            <Skeleton className="h-4 w-4" />
+          </div>
+          <div className="flex-1 flex px-2 items-center justify-start">
+            <Skeleton className="h-4 w-1/3" />
+          </div>
+          <div className="w-40 px-2 flex items-center justify-start">
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+          <div className="w-40 px-2 flex items-center justify-start">
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+          <div className="w-10 flex items-center justify-center">
+            <Skeleton className="h-4 w-4" />
+          </div>
+        </div>
+
+        {/* Skeleton Rows */}
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div key={i} className="flex h-10 hover:bg-muted/50">
+            <div className="w-10 flex items-center justify-center">
+              <Skeleton className="h-4 w-4" />
+            </div>
+            <div className="flex-1 flex px-2 items-center justify-start">
+              <Skeleton className="h-4 w-full" />
+            </div>
+            <div className="w-40 px-2 flex items-center justify-start">
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+            <div className="w-40 px-2 flex items-center justify-start">
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+            <div className="w-10 flex items-center justify-center">
+              <Skeleton className="h-4 w-4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

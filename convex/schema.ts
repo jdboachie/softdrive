@@ -42,28 +42,22 @@ export default defineSchema({
     .index("by_teamId", ["teamId"])
     .index("by_teamId_inviteeEmail", ["teamId", "inviteeEmail"]),
 
-  folders: defineTable({
-    name: v.string(),
-    teamId: v.id("teams"),
-    parentId: v.optional(v.id("folders")),
-    createdAt: v.number(),
-  })
-    .index("by_teamId", ["teamId"])
-    .index("by_teamId_parentId", ["teamId", "parentId"]),
-
   files: defineTable({
     name: v.string(),
-    size: v.number(),
+    size: v.optional(v.number()),
     type: v.string(),
-    author: v.id("users"),
+    path: v.string(),
+    authorId: v.id("users"),
+    isFolder: v.boolean(),
+    parentId: v.optional(v.id("files")),
     teamId: v.id("teams"),
-    favorite: v.optional(v.boolean()),
-    folderId: v.optional(v.id("folders")),
-    storageId: v.id("_storage"),
+    isStarred: v.optional(v.boolean()),
+    storageId: v.optional(v.id("_storage")),
     trashed: v.boolean(),
     trashedAt: v.optional(v.number()),
+    updatedAt: v.optional(v.number()),
   })
     .index("by_teamId", ["teamId"])
-    .index("by_teamId_folderId", ["teamId", "folderId"])
-    .index("by_teamId_trashed", ["teamId", "trashed"]),
+    .index("by_teamId_trashed", ["teamId", "trashed"])
+    .index("by_teamId_parentId_trashed", ["teamId", "parentId", "trashed"]),
 })

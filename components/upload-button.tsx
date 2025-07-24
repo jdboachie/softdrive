@@ -10,6 +10,7 @@ import {
   DialogTrigger,
   DialogContent,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -20,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { Input } from "@/components/ui/input"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
@@ -28,6 +29,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useTeam } from "@/hooks/use-team"
 import { UploadIcon } from "@phosphor-icons/react"
 import { renderFileIcon } from "./file-item"
+import { usePathname } from "next/navigation"
+import { Id } from "@/convex/_generated/dataModel"
 
 const formSchema = z.object({
   files: z
@@ -37,19 +40,23 @@ const formSchema = z.object({
 
 export default function UploadButton() {
   const { team, loading } = useTeam()
+  const pathname = usePathname()
+  const folderId = pathname.split("/")[4] as Id<"files"> // /t/teamId/f/folderId
+
+  const parentFolder = useQuery(
+    api.files.getFileById,
+    folderId ? { id: folderId } : "skip",
+  )
+
   const createFile = useMutation(api.files.createFile)
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl)
 
-  const [dialogOpen, setDialogOpen] = React.useState<boolean>(false)
+  const [dialogOpen, setDialogOpen] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
-
-  const maxFiles = 1
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      files: [],
-    },
+    defaultValues: { files: [] },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -57,8 +64,10 @@ export default function UploadButton() {
       toast.error("Unauthorized")
       return
     }
+
     form.reset()
     setDialogOpen(false)
+
     toast.promise(
       Promise.all(
         values.files.map(async (file) => {
@@ -72,18 +81,20 @@ export default function UploadButton() {
             body: file,
           })
           const { storageId } = await result.json()
-          createFile({
+          await createFile({
             name: file.name,
             type: file.type,
             size: file.size,
             teamId: team._id,
-            storageId: storageId,
+            path: parentFolder ? parentFolder.path + '/' + file.name : file.name,
+            storageId,
+            parentId: folderId || undefined,
           })
         }),
       ),
       {
-        loading: `Uploading ${values.files.length} file${values.files.length > 1 ? "s" : ""}...`,
-        success: `${values.files.length} file${values.files.length > 1 ? "s" : ""} uploaded successfully!`,
+        loading: `Uploading ${values.files.length} file(s)...`,
+        success: `${values.files.length} file(s) uploaded successfully!`,
         error: "Upload failed",
       },
     )
@@ -94,10 +105,8 @@ export default function UploadButton() {
       <DialogTrigger asChild>
         <Button
           disabled={loading}
-          size={'lg'}
-          onClick={() => {
-            setDialogOpen(true)
-          }}
+          size="lg"
+          onClick={() => setDialogOpen(true)}
         >
           <UploadIcon weight="bold" size={32} className="size-5" />
           Upload files
@@ -107,15 +116,14 @@ export default function UploadButton() {
         <DialogHeader className="border-b-0">
           <DialogTitle>Upload files</DialogTitle>
           <DialogDescription>
-            Add files to {team?.name}&apos;s drive
+            {parentFolder
+              ? `Add files to “${parentFolder.name}” folder in ${team?.name}`
+              : `Add files to ${team?.name}'s drive`}
           </DialogDescription>
         </DialogHeader>
-        <div className="p-5 mb-5">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-5"
-            >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <div className="p-5">
               <FormField
                 control={form.control}
                 name="files"
@@ -133,15 +141,13 @@ export default function UploadButton() {
                           const droppedFiles = Array.from(
                             e.dataTransfer.files ?? [],
                           )
-                          if (droppedFiles.length) {
-                            const currentFiles = form.getValues("files") ?? []
-                            form.setValue("files", [
-                              ...currentFiles,
-                              ...droppedFiles,
-                            ])
-                          }
+                          const currentFiles = form.getValues("files") ?? []
+                          form.setValue("files", [
+                            ...currentFiles,
+                            ...droppedFiles,
+                          ])
                         }}
-                        className="border border-dashed max-h-72 min-h-32 pustify-center overflow-auto rounded-lg bg-accent/15 p-3 flex flex-col gap-3"
+                        className="border border-dashed max-h-72 min-h-16 justify-center overflow-auto rounded-lg bg-accent/15 p-3 flex flex-col gap-3"
                       >
                         <Input
                           ref={inputRef}
@@ -180,7 +186,7 @@ export default function UploadButton() {
                             onClick={() => inputRef.current?.click()}
                             className="underline cursor-pointer transition hover:text-foreground"
                           >
-                            select {maxFiles === 1 ? `file` : "files"}
+                            select files
                           </a>{" "}
                           to upload
                         </p>
@@ -189,9 +195,8 @@ export default function UploadButton() {
                     <FormDescription>
                       {field.value.length > 0 && (
                         <>
-                          {field.value.length}{" "}
-                          {field.value.length > 1 ? "files" : "file"} selected
-                          for upload
+                          {field.value.length} file
+                          {field.value.length > 1 && "s"} selected for upload
                         </>
                       )}
                     </FormDescription>
@@ -199,24 +204,24 @@ export default function UploadButton() {
                   </FormItem>
                 )}
               />
-              <div className="w-full flex justify-between">
-                <Button
-                  type="reset"
-                  variant={"outline"}
-                  onClick={() => {
-                    setDialogOpen(false)
-                    form.reset()
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={form.formState.isLoading}>
-                  Submit
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="reset"
+                variant="outline"
+                onClick={() => {
+                  setDialogOpen(false)
+                  form.reset()
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={form.formState.isLoading}>
+                Upload
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

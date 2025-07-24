@@ -1,6 +1,10 @@
-import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react"
-
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronsUpDown,
+  EyeOff,
+  XIcon,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   DropdownMenu,
@@ -9,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Column } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 
 interface DataTableColumnHeaderProps<TData, TValue>
@@ -37,9 +42,9 @@ export function DataTableColumnHeader<TData, TValue>({
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (
-              <ArrowDown className="text-primary" />
+              <ArrowDownIcon className="text-primary" />
             ) : column.getIsSorted() === "asc" ? (
-              <ArrowUp className="text-primary" />
+              <ArrowUpIcon className="text-primary" />
             ) : (
               <ChevronsUpDown />
             )}
@@ -47,12 +52,16 @@ export function DataTableColumnHeader<TData, TValue>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUp />
+            <ArrowUpIcon />
             Asc
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown />
+            <ArrowDownIcon />
             Desc
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={column.getIsSorted() === false} onClick={() => column.toggleSorting(undefined)}>
+            <XIcon />
+            Clear sorting
           </DropdownMenuItem>
           {column.getCanHide() && (
             <>

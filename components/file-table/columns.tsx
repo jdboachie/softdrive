@@ -1,19 +1,21 @@
 "use client"
 
-import { Doc, Id } from "@/convex/_generated/dataModel"
-import { formatBytes, formatRelativeDate } from "@/lib/utils"
-import { ColumnDef } from "@tanstack/react-table"
-import { FileActions, renderFileIcon } from "../file-item"
+import Link from "next/link"
+import { useState } from "react"
 import { Button } from "../ui/button"
 import { Checkbox } from "../ui/checkbox"
-import { StarIcon } from "@phosphor-icons/react"
-import { useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
 import { useTeam } from "@/hooks/use-team"
+import { ColumnDef } from "@tanstack/react-table"
+import { api } from "@/convex/_generated/api"
+import { useMutation, useQuery } from "convex/react"
+import { Doc, Id } from "@/convex/_generated/dataModel"
+import { FileActions, renderFileIcon } from "../file-item"
+import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { useState } from "react"
+import { StarIcon, FolderSimpleIcon } from "@phosphor-icons/react"
 
-export const columns: ColumnDef<Doc<"files">>[] = [
+const commonColumns: ColumnDef<Doc<"files">>[] = [
+  // select
   {
     id: "select",
     header: ({ table }) => (
@@ -25,6 +27,7 @@ export const columns: ColumnDef<Doc<"files">>[] = [
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="!shadow-none data-[state=checked]:shadow-xs"
         />
       </div>
     ),
@@ -41,6 +44,7 @@ export const columns: ColumnDef<Doc<"files">>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+  // name
   {
     accessorKey: "name",
     enableHiding: false,
@@ -52,14 +56,10 @@ export const columns: ColumnDef<Doc<"files">>[] = [
       />
     ),
     cell: ({ row }) => {
-      return (
-        <div className="flex gap-2 items-center max-w-[45ch] w-full">
-          {renderFileIcon(row.original.type)}
-          <span className="truncate">{row.original.name}</span>
-        </div>
-      )
+      return <FileLink file={row.original} />
     },
   },
+  // favorite
   {
     accessorKey: "favorite",
     header: undefined,
@@ -67,30 +67,34 @@ export const columns: ColumnDef<Doc<"files">>[] = [
       return (
         <FavoriteButton
           fileId={row.original._id}
-          favorite={row.original.favorite ?? false}
+          favorite={row.original.isStarred ?? false}
         />
       )
     },
   },
+  // size
   {
     accessorKey: "size",
     header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="Size"
-      />
+      <DataTableColumnHeader column={column} title="Size" />
     ),
     cell: ({ row }) => {
+      if (row.original.isFolder)
+        return <span className="text-xs text-muted-foreground">-</span>
+      if (!row.original.size)
+        return <span className="text-xs text-muted-foreground">-</span>
       return <>{formatBytes(row.getValue("size"))}</>
     },
   },
+]
+
+export const columns: ColumnDef<Doc<"files">>[] = [
+  ...commonColumns,
+  // created at
   {
     accessorKey: "_createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="Created At"
-      />
+      <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => {
       return (
@@ -100,6 +104,32 @@ export const columns: ColumnDef<Doc<"files">>[] = [
       )
     },
   },
+  // actions
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      return <FileActions file={row.original} />
+    },
+  },
+]
+
+export const trashColumns: ColumnDef<Doc<"files">>[] = [
+  ...commonColumns,
+  // trashed at
+  {
+    accessorKey: "trashedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Trashed At" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-right">
+          {formatRelativeDate(row.original.trashedAt!)}
+        </div>
+      )
+    },
+  },
+  // actions
   {
     id: "actions",
     cell: ({ row }) => {
@@ -117,7 +147,7 @@ function FavoriteButton({
 }) {
   const { team, loading } = useTeam()
   const [pending, setPending] = useState<boolean>()
-  const toggleFileFavorite = useMutation(api.files.toggleFileFavorite)
+  const toggleFileIsStarred = useMutation(api.files.toggleFileIsStarred)
 
   return (
     <Button
@@ -128,11 +158,44 @@ function FavoriteButton({
       onClick={async () => {
         if (!team) return
         setPending(true)
-        await toggleFileFavorite({ teamId: team._id, fileId: fileId })
+        await toggleFileIsStarred({ teamId: team._id, fileId: fileId })
         setPending(false)
       }}
     >
       <StarIcon weight={favorite ? "fill" : "regular"} />
     </Button>
+  )
+}
+
+function FileLink({ file }: { file: Doc<"files"> }) {
+  const { team } = useTeam()
+  const fileUrl = useQuery(
+    api.storage.getFileUrl,
+    file.isFolder || !file.storageId ? "skip" : { src: file.storageId },
+  )
+
+  return (
+    <Link
+      target={file.isFolder ? "_self" : "_blank"}
+      href={
+        file.isFolder && team
+          ? `/t/${team._id}/f/${file._id}`
+          : !file.isFolder && fileUrl
+            ? fileUrl
+            : "#"
+      }
+      className="flex gap-2 items-center w-fit lg:max-w-[65ch] md:max-w-[35ch] hover:underline hover:underline-offset-3 decoration-dotted"
+    >
+      {file.isFolder ? (
+        <FolderSimpleIcon
+          size={32}
+          weight="fill"
+          className="size-6 text-primary"
+        />
+      ) : (
+        renderFileIcon(file.type)
+      )}
+      <span className="truncate">{file.name}</span>
+    </Link>
   )
 }

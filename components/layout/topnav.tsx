@@ -7,10 +7,10 @@ import { usePathname } from "next/navigation"
 import { buttonVariants } from "@/components/ui/button"
 
 const links = [
-  { label: "Files", url: "" },
+  { label: "Home", url: "" },
   { label: "Trash", url: "/trash" },
-  { label: "Favorites", url: "/favorites" },
-  { label: "Settings", url: "/settings" },
+  // { label: "Starred", url: "/starred" },
+  // { label: "Settings", url: "/settings" },
 ]
 
 export default function TopNav() {
@@ -21,8 +21,12 @@ export default function TopNav() {
   const basePath = pathname.split("/").slice(0, 3).join("/") // /t/teamId
 
   const isActive = (url: string) => {
-    const target = url === "" ? basePath : `${basePath}${url}`
-    return url === "" ? pathname === target : pathname.startsWith(target)
+    if (url === "") {
+      // Match if base path or a folder under "files" (i.e., ends with /f/[id])
+      return pathname === basePath || /^\/t\/[^/]+\/f\/[^/]+$/.test(pathname)
+    }
+    const target = `${basePath}${url}`
+    return pathname.startsWith(target)
   }
 
   useEffect(() => {

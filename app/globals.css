@@ -100,7 +100,7 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
+  --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
@@ -140,9 +140,11 @@
   * {
     @apply font-sans border-border outline-ring/50;
   }
+
   *::selection {
     @apply bg-primary/40;
   }
+
   body {
     @apply bg-ground text-foreground;
   }
@@ -162,12 +164,10 @@
     position: absolute;
     inset: 0;
     width: 100%;
-    background: linear-gradient(
-      90deg,
-      var(--skeleton-end),
-      var(--skeleton),
-      var(--skeleton-end)
-    );
+    background: linear-gradient(90deg,
+        var(--skeleton-end),
+        var(--skeleton),
+        var(--skeleton-end));
     animation: shimmer 2s linear infinite;
   }
 
@@ -179,6 +179,7 @@
     0% {
       transform: translateX(-100%);
     }
+
     100% {
       transform: translateX(100%);
     }

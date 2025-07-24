@@ -24,18 +24,18 @@ export function ColumnVisibilityButton<TData>({
 }: ColumnVisibilityButtonProps<TData>) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Tooltip>
+      <Tooltip delayDuration={250}>
+        <DropdownMenuTrigger asChild>
           <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" className="size-7">
               <ChevronDownIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>Toggle columns</p>
-          </TooltipContent>
-        </Tooltip>
-      </DropdownMenuTrigger>
+        </DropdownMenuTrigger>
+        <TooltipContent side="left">
+          <p>Toggle columns</p>
+        </TooltipContent>
+      </Tooltip>
       <DropdownMenuContent align="end">
         {table
           .getAllColumns()

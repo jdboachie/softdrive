@@ -26,7 +26,6 @@ export default function UserButton() {
       <DropdownMenuTrigger asChild>
         <Button size="icon" variant="outline" className="rounded-full shadow-none size-9 p-px">
           {user ? <UserImage src={user?.image} /> : <Skeleton className="rounded-full" />}
-
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
