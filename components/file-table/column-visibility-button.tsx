@@ -1,14 +1,19 @@
 "use client"
 
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { ChevronDownIcon } from "lucide-react"
 import { Table } from "@tanstack/react-table"
+import { ChevronDownIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface ColumnVisibilityButtonProps<TData> {
   table: Table<TData>
@@ -20,10 +25,16 @@ export function ColumnVisibilityButton<TData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="ml-auto">
-          Columns
-          <ChevronDownIcon />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="size-7">
+              <ChevronDownIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Toggle columns</p>
+          </TooltipContent>
+        </Tooltip>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {table
@@ -34,11 +45,9 @@ export function ColumnVisibilityButton<TData>({
               key={column.id}
               className="capitalize"
               checked={column.getIsVisible()}
-              onCheckedChange={(value) =>
-                column.toggleVisibility(!!value)
-              }
+              onCheckedChange={(value) => column.toggleVisibility(!!value)}
             >
-              {column.id === "_creationTime" ? "Created at" : column.id}
+              {column.id === "_createdAt" ? "Created at" : column.id}
             </DropdownMenuCheckboxItem>
           ))}
       </DropdownMenuContent>

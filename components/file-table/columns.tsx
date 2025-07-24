@@ -48,14 +48,14 @@ export const columns: ColumnDef<Doc<"files">>[] = [
       <DataTableColumnHeader
         column={column}
         title="Name"
-        className="text-right"
+        className="text-right w-full"
       />
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center max-w-[45ch] w-full">
           {renderFileIcon(row.original.type)}
-          {row.original.name}
+          <span className="truncate">{row.original.name}</span>
         </div>
       )
     },
@@ -74,9 +74,14 @@ export const columns: ColumnDef<Doc<"files">>[] = [
   },
   {
     accessorKey: "size",
-    header: "Size",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Size"
+      />
+    ),
     cell: ({ row }) => {
-      return <div>{formatBytes(row.getValue("size"))}</div>
+      return <>{formatBytes(row.getValue("size"))}</>
     },
   },
   {
@@ -85,7 +90,6 @@ export const columns: ColumnDef<Doc<"files">>[] = [
       <DataTableColumnHeader
         column={column}
         title="Created At"
-        className="w-full justify-end -mr-2"
       />
     ),
     cell: ({ row }) => {
