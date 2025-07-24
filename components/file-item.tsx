@@ -27,7 +27,6 @@ import { useTeam } from "@/hooks/use-team"
 import { Doc } from "@/convex/_generated/dataModel"
 import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import UserImage from "./user-image"
-import { ConvexError } from "convex/values"
 
 export function renderFileIcon(type: string) {
   if (!type) return <div className="size-5 bg-accent rounded-sm" />
