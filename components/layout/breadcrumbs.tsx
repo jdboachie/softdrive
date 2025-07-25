@@ -33,7 +33,7 @@ const Breadcrumbs = () => {
 
   const label = isFolder
     ? folder?.name || (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2.5">
           <Skeleton className="w-52 h-9" />
           <Skeleton className="w-36 h-3" />
         </div>

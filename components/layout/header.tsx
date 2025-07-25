@@ -40,10 +40,10 @@ export function HeaderSkeleton() {
       </div>
       <div className="containor mx-auto">
         <nav className="flex p-2 gap-1">
-          <Skeleton className="h-7 w-20" />
-          <Skeleton className="h-7 w-20" />
-          <Skeleton className="h-7 w-20" />
-          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-8 w-20" />
         </nav>
       </div>
     </header>
