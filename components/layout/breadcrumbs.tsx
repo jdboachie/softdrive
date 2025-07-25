@@ -34,8 +34,8 @@ const Breadcrumbs = () => {
   const label = isFolder
     ? folder?.name || (
         <div className="flex flex-col gap-2">
-        <Skeleton className="w-52 h-9" />
-        <Skeleton className="w-36 h-2" />
+          <Skeleton className="w-52 h-9" />
+          <Skeleton className="w-36 h-2" />
         </div>
       )
     : capitalize(segments[2] ?? "Home")
@@ -76,6 +76,7 @@ const Breadcrumbs = () => {
       </Breadcrumb>
       {isFolder && folder && (
         <Link
+          prefetch
           href={`/t/${segments[1]}`}
           className="flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground"
         >
