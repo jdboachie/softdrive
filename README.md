@@ -2,8 +2,9 @@
 
 - [ ] `bug` fix responsive design issues
 - [ ] `bug` fix clear filter button not working
-- [ ] remove invites for now
+- [ ] `unused` remove invites for now
 - [ ] `enhancement` make file uploads more robust. it should show progress, handle errors better
+- [ ] `feature` move files around in the file tree
 - [ ] `feature` add a way to filter files by type or size
 - [ ] `feature` should confirm before permanently deleting files
 - [ ] `feature` inline rename files and folders
