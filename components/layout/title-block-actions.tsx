@@ -1,7 +1,7 @@
 "use client"
 
-import { usePathname } from "next/navigation"
 import UploadButton from "../upload-button"
+import { usePathname } from "next/navigation"
 import EmptyTrashButton from "../empty-trash-button"
 import CreateFolderButton from "../create-folder-button"
 

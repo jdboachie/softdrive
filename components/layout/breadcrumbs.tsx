@@ -32,7 +32,12 @@ const Breadcrumbs = () => {
   )
 
   const label = isFolder
-    ? folder?.name || <Skeleton className="w-52 h-9" />
+    ? folder?.name || (
+        <div className="flex flex-col gap-2">
+        <Skeleton className="w-52 h-9" />
+        <Skeleton className="w-36 h-2" />
+        </div>
+      )
     : capitalize(segments[2] ?? "Home")
 
   return (
@@ -47,10 +52,13 @@ const Breadcrumbs = () => {
               return (
                 <>
                   <BreadcrumbItem className="text-3xl font-medium">
-                    <BreadcrumbLink
-                      href={`/t/${segments[1]}/f/${folder.parentId}`}
-                    >
-                      {parentFolder}
+                    <BreadcrumbLink asChild>
+                      <Link
+                        prefetch
+                        href={`/t/${segments[1]}/f/${folder.parentId}`}
+                      >
+                        {parentFolder}
+                      </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="[&>svg]:size-6">
