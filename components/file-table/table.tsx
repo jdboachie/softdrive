@@ -160,7 +160,7 @@ export function DataTableSkeleton() {
               <Skeleton className="h-4 w-3/4" />
             </div>
             <div className="w-40 px-2 flex items-center justify-start">
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-2/3" />
             </div>
             <div className="w-10 flex items-center justify-center">
               <Skeleton className="h-4 w-4" />
