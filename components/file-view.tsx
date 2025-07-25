@@ -40,6 +40,7 @@ export function FileViewSelector() {
         <Button variant="outline">
           {view === "list" ? <ListDashesIcon /> : <SquaresFourIcon />}
           <ChevronDownIcon className="ml-2" />
+          <span className="sr-only">Toggle view</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
