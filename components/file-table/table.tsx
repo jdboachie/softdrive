@@ -98,7 +98,7 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <div
                 key={row.id}
-                className="flex hover:bg-muted/50 min-w-0 h-10"
+                className="flex hover:bg-muted/50 min-w-0 h-10 data-[state=selected]:bg-muted"
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => {
@@ -149,18 +149,21 @@ export function DataTableSkeleton() {
 
         {/* Skeleton Rows */}
         {Array.from({ length: 50 }).map((_, i) => (
-          <div key={i} className="flex h-10 hover:bg-muted/50">
+          <div key={i} className="flex h-10">
             <div className="w-10 flex items-center justify-center">
               <Skeleton className="h-4 w-4" />
             </div>
             <div className="flex-1 flex px-2 items-center justify-start">
               <Skeleton className="h-4 w-full" />
             </div>
-            <div className="w-40 px-2 flex items-center justify-start">
-              <Skeleton className="h-4 w-3/4" />
+            <div className="w-10 flex items-center justify-center">
+              <Skeleton className="h-4 w-4" />
             </div>
             <div className="w-40 px-2 flex items-center justify-start">
-              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+            <div className="w-40 px-2 flex items-center justify-start">
+              <Skeleton className="h-4 w-full" />
             </div>
             <div className="w-10 flex items-center justify-center">
               <Skeleton className="h-4 w-4" />

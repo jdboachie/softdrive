@@ -18,7 +18,7 @@ export default function FileSearch({ placeholder }: { placeholder?: string }) {
   }, 500)
 
   return (
-    <div className="max-w-md relative rounded-md bg-background">
+    <div className="w-full max-w-md relative rounded-md bg-background">
       <MagnifyingGlassIcon className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
       <Input
         className="!px-8 !bg-transparent"

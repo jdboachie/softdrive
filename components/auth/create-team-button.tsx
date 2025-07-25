@@ -57,6 +57,7 @@ export default function CreateTeamButton() {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button
+          disabled
           size={"sm"}
           variant={"ghost"}
           className="justify-start font-normal"

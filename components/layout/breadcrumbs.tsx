@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { useQuery } from "convex/react"
 import { SlashIcon } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -21,6 +21,7 @@ const capitalize = (s: string) =>
   s.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 
 const Breadcrumbs = () => {
+  const router = useRouter()
   const pathname = usePathname()
   const segments = pathname.split("/").filter(Boolean)
 
@@ -75,14 +76,13 @@ const Breadcrumbs = () => {
         </BreadcrumbList>
       </Breadcrumb>
       {isFolder && folder && (
-        <Link
-          prefetch
-          href={`/t/${segments[1]}`}
-          className="flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground"
+        <div
+          onClick={() => {router.back()}}
+          className="flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground cursor-pointer"
         >
           <ArrowElbowUpLeftIcon />
-          Go back to files
-        </Link>
+          Back
+        </div>
       )}
     </div>
   )

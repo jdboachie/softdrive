@@ -12,6 +12,8 @@ import {
   ImageSquareIcon,
   MicrosoftWordLogoIcon,
   TrashIcon,
+  StarIcon,
+  DotsThreeVerticalIcon,
 } from "@phosphor-icons/react"
 import { toast } from "sonner"
 import { Button } from "./ui/button"
@@ -20,8 +22,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
 import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
 import { useTeam } from "@/hooks/use-team"
@@ -33,16 +45,16 @@ export function renderFileIcon(type: string) {
   if (!type) return <div className="size-5 bg-accent rounded-sm" />
 
   if (type === "application/pdf")
-    return <FilePdfIcon size={32} className="size-5 min-w-5" />
+    return <FilePdfIcon size={32} className="size-5 shrink-0" />
 
   if (type === "text/csv")
-    return <FileCsvIcon size={32} className="size-5 min-w-5" />
+    return <FileCsvIcon size={32} className="size-5 shrink-0" />
 
   if (type === "application/json")
-    return <BracketsCurlyIcon size={32} className="size-5 min-w-5" />
+    return <BracketsCurlyIcon size={32} className="size-5 shrink-0" />
 
   if (type === "image/jpeg" || type === "image/png")
-    return <ImageSquareIcon size={32} className="size-5 min-w-5" />
+    return <ImageSquareIcon size={32} className="size-5 shrink-0" />
 
   if (
     type ===
@@ -52,7 +64,7 @@ export function renderFileIcon(type: string) {
       <MicrosoftWordLogoIcon
         size={32}
         weight="fill"
-        className="size-5 min-w-5 text-blue-500"
+        className="size-5 shrink-0 text-blue-500"
       />
     )
 
@@ -96,7 +108,17 @@ export default function FileItem({
   )
 }
 
-export const FileActions = ({ file }: { file: Doc<"files"> }) => {
+export const FileActions = ({
+  file,
+  buttonVariant = "ghost",
+  className,
+  useVerticalIcon,
+}: {
+    file: Doc<"files">
+  buttonVariant?: "ghost" | "outline"
+  className?: string
+  useVerticalIcon?: boolean
+}) => {
   const { team, loading } = useTeam()
 
   const trashFile = useMutation(api.files.trashFile)
@@ -116,11 +138,18 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
         <Button
           disabled={loading}
           size={"icon"}
-          variant={"ghost"}
-          className="!size-7"
+          variant={buttonVariant ?? "ghost"}
+          className={"!size-7" + (className ? ` ${className}` : "")}
         >
-          <DotsThreeIcon weight="bold" className="size-4 text-foreground" />
-          <span className="sr-only">Options</span>
+          {useVerticalIcon ? (
+            <DotsThreeVerticalIcon
+              weight="bold"
+              className="size-4 text-foreground"
+            />
+          ) : (
+            <DotsThreeIcon weight="bold" className="size-4 text-foreground" />
+          )}
+          <span className="sr-only">File actions</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -155,38 +184,60 @@ export const FileActions = ({ file }: { file: Doc<"files"> }) => {
               <ArrowCounterClockwiseIcon weight="bold" />
               Restore
             </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => {
-                if (!team) return
-                toast.promise(
-                  deleteFilePermanently({
-                    teamId: team._id,
-                    fileId: file._id,
-                  }),
-                  {
-                    loading: "Deleting file...",
-                    success: "Deleted successfully",
-                    error: "Error deleting file",
-                  },
-                )
-              }}
-            >
-              <FileXIcon weight="bold" />
-              Delete permanently
-            </DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem variant="destructive">
+                  <FileXIcon weight="bold" />
+                  Delete permanently
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete file permanently?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. The file will be permanently
+                    deleted.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => {
+                      if (!team) return
+                      toast.promise(
+                        deleteFilePermanently({
+                          teamId: team._id,
+                          fileId: file._id,
+                        }),
+                        {
+                          loading: "Deleting file...",
+                          success: "Deleted successfully",
+                          error: "Error deleting file",
+                        },
+                      )
+                    }}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </>
         ) : (
           <>
-            <DropdownMenuCheckboxItem
-              checked={file.isStarred}
+            <DropdownMenuItem
               onClick={() => {
                 if (!team) return
                 toggleFileFavorite({ teamId: team._id, fileId: file._id })
               }}
             >
+              <StarIcon
+                weight={file.isStarred ? "fill" : "regular"}
+                className="size-4"
+              />
               {file.isStarred ? "Unstar" : "Star"}
-            </DropdownMenuCheckboxItem>
+            </DropdownMenuItem>
 
             <DropdownMenuItem
               onClick={async () => {

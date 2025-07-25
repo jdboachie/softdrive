@@ -61,7 +61,7 @@ export default function TeamButton() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="min-w-[150px] p-0">
+      <PopoverContent className="!min-w-[100px] p-0">
         <Command>
           <CommandInput placeholder="Search teams..." className="h-9" />
           <CommandList>
