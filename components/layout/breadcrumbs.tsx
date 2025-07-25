@@ -35,7 +35,7 @@ const Breadcrumbs = () => {
     ? folder?.name || (
         <div className="flex flex-col gap-2">
           <Skeleton className="w-52 h-9" />
-          <Skeleton className="w-36 h-2" />
+          <Skeleton className="w-36 h-3" />
         </div>
       )
     : capitalize(segments[2] ?? "Home")
