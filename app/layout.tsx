@@ -49,14 +49,6 @@ export default function RootLayout({
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang="en" suppressHydrationWarning>
-        <head>
-          <script
-            async
-            crossOrigin="anonymous"
-            src="//unpkg.com/react-scan/dist/auto.global.js"
-          />
-          {/* rest of your scripts go under */}
-        </head>
         <body className={`${sans.variable} ${geistMono.variable} antialiased`}>
           <ConvexClientProvider>
             <ThemeProvider

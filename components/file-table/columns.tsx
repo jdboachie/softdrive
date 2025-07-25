@@ -80,9 +80,9 @@ const commonColumns: ColumnDef<Doc<"files">>[] = [
     ),
     cell: ({ row }) => {
       if (row.original.isFolder)
-        return <span className="text-xs text-muted-foreground">-</span>
+        return null
       if (!row.original.size)
-        return <span className="text-xs text-muted-foreground">-</span>
+        return null
       return <>{formatBytes(row.getValue("size"))}</>
     },
   },
