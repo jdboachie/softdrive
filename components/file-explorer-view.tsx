@@ -15,7 +15,7 @@ import { ExplorerGridView, ExplorerGridViewSkeleton } from "./explorer-grid-view
 
 export default function FileExplorerView({
   folderId,
-  trash = false,
+  trash,
 }: {
   folderId?: Id<"files">
   trash?: boolean
@@ -48,7 +48,7 @@ export default function FileExplorerView({
     team
       ? {
           teamId: team._id,
-          parentId: folderId,
+          ...(!trash && { parentId: folderId }),
           searchQuery: query,
         }
       : "skip",

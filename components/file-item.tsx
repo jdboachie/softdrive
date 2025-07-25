@@ -233,7 +233,7 @@ export const FileActions = ({
               }}
             >
               <StarIcon
-                weight={file.isStarred ? "fill" : "regular"}
+                weight={file.isStarred ? "fill" : "bold"}
                 className="size-4"
               />
               {file.isStarred ? "Unstar" : "Star"}

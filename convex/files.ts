@@ -86,7 +86,7 @@ export const getFilesPaginated = query({
 export const getTrashedFiles = query({
   args: {
     teamId: v.id("teams"),
-    parentId: v.optional(v.id("files")),
+    // parentId: v.optional(v.id("files")),
     searchQuery: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -106,11 +106,8 @@ export const getTrashedFiles = query({
 
     const files = await ctx.db
       .query("files")
-      .withIndex("by_teamId_parentId_trashed", (q) =>
-        q
-          .eq("teamId", args.teamId)
-          .eq("parentId", args.parentId)
-          .eq("trashed", true),
+      .withIndex("by_teamId_trashed", (q) =>
+        q.eq("teamId", args.teamId).eq("trashed", true),
       )
       .collect()
 

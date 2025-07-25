@@ -29,19 +29,6 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_userId_teamId", ["userId", "teamId"]),
 
-  invites: defineTable({
-    teamId: v.id("teams"),
-    inviterId: v.id("users"),
-    inviteeEmail: v.string(),
-    role: v.union(v.literal("read"), v.literal("write"), v.literal("admin")),
-    createdAt: v.number(),
-    expiresAt: v.number(),
-    acceptedAt: v.optional(v.number()),
-  })
-    .index("by_inviteeEmail", ["inviteeEmail"])
-    .index("by_teamId", ["teamId"])
-    .index("by_teamId_inviteeEmail", ["teamId", "inviteeEmail"]),
-
   files: defineTable({
     name: v.string(),
     size: v.optional(v.number()),
