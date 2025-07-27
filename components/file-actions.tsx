@@ -41,7 +41,7 @@ export const FileActions = ({
   useVerticalIcon,
 }: {
   file: Doc<"files">
-  buttonVariant?: "ghost" | "outline"
+  buttonVariant?: "ghost" | "outline" | "secondary"
   className?: string
   useVerticalIcon?: boolean
 }) => {

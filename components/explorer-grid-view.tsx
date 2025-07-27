@@ -35,10 +35,11 @@ function FileCard({ file }: { file: Doc<"files"> }) {
 
   return (
     <div className={cn("flex flex-col gap-2 rounded-md text-center")}>
-      <div className="border relative grid place-items-center h-52 p-3 rounded-sm bg-card">
+      <div className="border relative grid place-items-center h-52 p-3 rounded-sm bg-card hover:bg-muted">
         <FileActions
           file={file}
           useVerticalIcon
+          buttonVariant="secondary"
           className="absolute top-2 right-2"
         />
         {file.isFolder ? (
@@ -53,7 +54,7 @@ function FileCard({ file }: { file: Doc<"files"> }) {
             alt={file.name}
             width={500}
             height={500}
-            className="size-full object-cover overflow-hidden rounded-xs"
+            className="size-full object-contain overflow-hidden rounded-xs"
           />
         ) : (
           <FileIcon type={file.type} size="lg" />
