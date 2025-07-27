@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { FileIcon } from "./file-icon"
 import { useTeam } from "@/hooks/use-team"
 import { FileActions } from "./file-actions"
@@ -8,6 +9,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Doc } from "@/convex/_generated/dataModel"
 import { FolderSimpleIcon } from "@phosphor-icons/react"
 import { cn, formatBytes, formatRelativeDate } from "@/lib/utils"
+
+// Helper function to check if file type is an image
+function isImageFile(fileType: string): boolean {
+  return fileType.toLowerCase().startsWith('image/')
+}
 
 export function ExplorerGridView({ files }: { files: Doc<"files">[] }) {
   return (
@@ -40,6 +46,14 @@ function FileCard({ file }: { file: Doc<"files"> }) {
             weight="fill"
             size={128}
             className="size-32 text-primary"
+          />
+        ) : isImageFile(file.type) && file.url ? (
+          <Image
+            src={file.url}
+            alt={file.name}
+            width={500}
+            height={500}
+            className="size-full object-cover overflow-hidden"
           />
         ) : (
           <FileIcon type={file.type} size="lg" />
