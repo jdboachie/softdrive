@@ -15,18 +15,18 @@ interface FileIconProps {
 
 export function FileIcon({ type, size = "md", className }: FileIconProps) {
   const sizeClasses = {
-    sm: "size-5",
+    sm: "size-4",
     md: "size-6",
     lg: "size-32",
   }
 
   const iconSize = {
-    sm: 20,
+    sm: 16,
     md: 24,
     lg: 128,
   }
 
-  const weight = size === "sm" ? "bold" : "thin"
+  const weight = size === "md" ? "bold" : size === "sm" ? "regular" : "thin"
 
   const baseClasses = cn("shrink-0", sizeClasses[size], className)
 

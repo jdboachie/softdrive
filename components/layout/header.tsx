@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Header() {
   return (
-    <header className="border-b sticky top-0 z-10 bg-background/80 backdrop-blur-sm">
+    <header className="border-b sticky top-0 z-10 bg-background/90 backdrop-blur-md">
       <div className="size-full containor mx-auto flex justify-between gap-3 items-center p-4 px-5 pb-2">
         <div className="flex items-center w-fit gap-1 sm:gap-2">
           <TabsIcon size={32} weight="fill" className="mr-3" />
