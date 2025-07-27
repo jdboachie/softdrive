@@ -152,6 +152,10 @@ export const createFile = mutation({
       throw new Error("Storage ID is required for files")
     }
 
+    const url = args.storageId
+      ? (await ctx.storage.getUrl(args.storageId)) ?? undefined
+      : undefined
+
     return await ctx.db.insert("files", {
       name: args.name,
       type: args.type,
@@ -163,6 +167,7 @@ export const createFile = mutation({
       teamId: args.teamId,
       trashed: false,
       storageId: args.storageId,
+      url: url,
     })
   },
 })

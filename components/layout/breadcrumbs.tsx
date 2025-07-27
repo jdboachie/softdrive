@@ -42,7 +42,7 @@ const Breadcrumbs = () => {
     : capitalize(segments[2] ?? "Home")
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full">
       <Breadcrumb>
         <BreadcrumbList>
           {folder?.parentId &&
@@ -77,12 +77,29 @@ const Breadcrumbs = () => {
       </Breadcrumb>
       {isFolder && folder && (
         <div
-          onClick={() => {router.back()}}
+          onClick={() => {
+            router.back()
+          }}
           className="flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground cursor-pointer"
         >
           <ArrowElbowUpLeftIcon />
           Back
         </div>
+      )}
+      {segments[2] === "my-drive" && (
+        <span className="text-xs text-muted-foreground">
+          These are your personal files
+        </span>
+      )}
+      {segments[2] === "trash" && (
+        <span className="text-xs text-muted-foreground">
+          Items in trash are deleted automatically after 30 days
+        </span>
+      )}
+      {!segments[2] && (
+        <span className="text-xs text-muted-foreground">
+          Welcome to your softdrive
+        </span>
       )}
     </div>
   )

@@ -4,12 +4,13 @@ import Link from "next/link"
 import { useState } from "react"
 import { Button } from "../ui/button"
 import { Checkbox } from "../ui/checkbox"
+import { FileIcon } from "../file-icon"
 import { useTeam } from "@/hooks/use-team"
-import { ColumnDef } from "@tanstack/react-table"
+import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { useMutation, useQuery } from "convex/react"
+import { FileActions } from "../file-actions"
+import { ColumnDef } from "@tanstack/react-table"
 import { Doc, Id } from "@/convex/_generated/dataModel"
-import { FileActions, renderFileIcon } from "../file-item"
 import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { StarIcon, FolderSimpleIcon } from "@phosphor-icons/react"
@@ -169,10 +170,6 @@ function FavoriteButton({
 
 function FileLink({ file }: { file: Doc<"files"> }) {
   const { team } = useTeam()
-  const fileUrl = useQuery(
-    api.storage.getFileUrl,
-    file.isFolder || !file.storageId ? "skip" : { src: file.storageId },
-  )
 
   return (
     <Link
@@ -180,8 +177,8 @@ function FileLink({ file }: { file: Doc<"files"> }) {
       href={
         file.isFolder && team
           ? `/t/${team._id}/f/${file._id}`
-          : !file.isFolder && fileUrl
-            ? fileUrl
+          : !file.isFolder && file.url
+            ? file.url
             : "#"
       }
       className="flex gap-2 items-center w-fit lg:max-w-[65ch] md:max-w-[35ch] hover:underline hover:underline-offset-3 decoration-dotted"
@@ -193,7 +190,7 @@ function FileLink({ file }: { file: Doc<"files"> }) {
           className="size-6 text-primary"
         />
       ) : (
-        renderFileIcon(file.type)
+        <FileIcon type={file.type} size="sm" />
       )}
       <span className="truncate">{file.name}</span>
     </Link>

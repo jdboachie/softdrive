@@ -94,6 +94,7 @@ export default function CreateFolderButton() {
           size="lg"
           variant={"outline"}
           onClick={() => setDialogOpen(true)}
+          className="max-md:w-full"
         >
           <FolderPlusIcon className="size-5" />
           Create folder

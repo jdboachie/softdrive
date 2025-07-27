@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div> */}
-      <div className="overflow-hidden rounded-sm ">
+      <div className="overflow-x-scroll rounded-sm">
         <div className="flex flex-col divide-y text-sm rounded-sm">
           {/* Header */}
           <div className="flex h-10 text-muted-foreground font-medium">

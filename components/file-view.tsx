@@ -4,13 +4,16 @@ import * as React from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ChevronDownIcon } from "lucide-react"
 import { ListDashesIcon, SquaresFourIcon } from "@phosphor-icons/react"
-import { useRouter } from "next/navigation"
 
 const VIEWS = ["list", "grid"] as const
 type ViewType = (typeof VIEWS)[number]
@@ -38,27 +41,35 @@ export function FileViewSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          {view === "list" ? <ListDashesIcon /> : <SquaresFourIcon />}
+          {view === "list" ? (
+            <ListDashesIcon weight="bold" />
+          ) : (
+            <SquaresFourIcon weight="bold" />
+          )}
           <ChevronDownIcon className="ml-2" />
           <span className="sr-only">Toggle view</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {VIEWS.map((v) => (
-          <DropdownMenuItem key={v} onSelect={() => handleChange(v)}>
-            {v === "list" ? (
-              <>
-                <ListDashesIcon />
-                List
-              </>
-            ) : (
-              <>
-                <SquaresFourIcon />
-                Grid
-              </>
-            )}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+        <DropdownMenuLabel>File view</DropdownMenuLabel>
+        <DropdownMenuSeparator/>
+          {VIEWS.map((v) => (
+            <DropdownMenuItem key={v} onSelect={() => handleChange(v)}>
+              {v === "list" ? (
+                <>
+                  <ListDashesIcon weight="bold" />
+                  List
+                </>
+              ) : (
+                <>
+                  <SquaresFourIcon weight="bold" />
+                  Grid
+                </>
+              )}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

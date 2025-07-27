@@ -40,6 +40,7 @@ export default defineSchema({
     parentId: v.optional(v.id("files")),
     isStarred: v.optional(v.boolean()),
     storageId: v.optional(v.id("_storage")),
+    url: v.optional(v.string()),
     trashed: v.boolean(),
     trashedAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),

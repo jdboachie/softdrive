@@ -11,12 +11,12 @@ export default function TitleBlockActions() {
 
   const current = segments[2] ?? "files"
 
-  if (current === "files" || current === "f")
+  if (current === "files" || current === "f" || current === "my-drive")
     return (
-      <div className="flex items-center gap-2">
+      <>
         <CreateFolderButton />
         <UploadButton />
-      </div>
+      </>
     )
   if (current === "trash") return <EmptyTrashButton />
   else return undefined

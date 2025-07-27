@@ -10,7 +10,7 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
       <TitleBlock>
         <TitleBlockActions />
       </TitleBlock>
-      <div className="containor mx-auto min-h-[calc(100dvh-250px)] grid sm:p-6 p-3">
+      <div className="containor mx-auto min-h-[calc(100dvh-268px)] grid sm:p-6 p-4 pb-12">
         {children}
       </div>
       <Footer />

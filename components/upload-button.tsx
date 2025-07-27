@@ -28,9 +28,9 @@ import { Button } from "@/components/ui/button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTeam } from "@/hooks/use-team"
 import { UploadIcon } from "@phosphor-icons/react"
-import { renderFileIcon } from "./file-item"
 import { usePathname } from "next/navigation"
 import { Id } from "@/convex/_generated/dataModel"
+import { FileIcon } from "./file-icon"
 
 const formSchema = z.object({
   files: z
@@ -107,6 +107,7 @@ export default function UploadButton() {
           disabled={loading}
           size="lg"
           onClick={() => setDialogOpen(true)}
+          className="max-md:w-full"
         >
           <UploadIcon weight="bold" size={32} className="size-5" />
           Upload files
@@ -172,7 +173,7 @@ export default function UploadButton() {
                                 key={idx}
                                 className="border flex items-center gap-2 rounded-sm p-2 h-10 bg-card"
                               >
-                                {renderFileIcon(file.type)}
+                                <FileIcon type={file.type} size="sm" />
                                 <span className="text-sm truncate">
                                   {file.name}
                                 </span>

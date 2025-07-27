@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button"
 
 const links = [
   { label: "Home", url: "" },
+  { label: "My Drive", url: "/my-drive" },
   { label: "Trash", url: "/trash" },
   // { label: "Starred", url: "/starred" },
   // { label: "Settings", url: "/settings" },

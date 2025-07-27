@@ -1,18 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { cn, formatBytes, formatRelativeDate } from "@/lib/utils"
+import { FileIcon } from "./file-icon"
 import { useTeam } from "@/hooks/use-team"
-import { FileActions, renderFileIcon } from "./file-item"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
+import { FileActions } from "./file-actions"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Doc } from "@/convex/_generated/dataModel"
 import { FolderSimpleIcon } from "@phosphor-icons/react"
-import { Skeleton } from "@/components/ui/skeleton"
+import { cn, formatBytes, formatRelativeDate } from "@/lib/utils"
 
 export function ExplorerGridView({ files }: { files: Doc<"files">[] }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-7 space-y-8">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-7 space-y-8">
       {files.map((file: Doc<"files">) => (
         <FileCard key={file._id} file={file} />
       ))}
@@ -27,35 +26,33 @@ export function ExplorerGridView({ files }: { files: Doc<"files">[] }) {
 
 function FileCard({ file }: { file: Doc<"files"> }) {
   const { team } = useTeam()
-  const fileUrl = useQuery(
-    api.storage.getFileUrl,
-    file.isFolder || !file.storageId ? "skip" : { src: file.storageId },
-  )
 
   return (
     <div className={cn("flex flex-col gap-2 rounded-md text-center")}>
-      <div className="border relative grid place-items-center h-52 rounded-sm bg-background">
+      <div className="border relative grid place-items-center h-52 rounded-sm bg-card">
         <FileActions
           file={file}
           useVerticalIcon
           className="absolute top-2 right-2"
         />
-        {file.isFolder && (
+        {file.isFolder ? (
           <FolderSimpleIcon
             weight="fill"
             size={128}
             className="size-32 text-primary"
           />
+        ) : (
+          <FileIcon type={file.type} size="lg" />
         )}
       </div>
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full px-1">
         <Link
           target={file.isFolder ? "_self" : "_blank"}
           href={
             file.isFolder && team
               ? `/t/${team._id}/f/${file._id}`
-              : !file.isFolder && fileUrl
-                ? fileUrl
+              : !file.isFolder && file.url
+                ? file.url
                 : "#"
           }
           className="flex gap-2 items-center text-sm min-w-0 py-2 hover:underline hover:underline-offset-3 hover:decoration-dotted"
@@ -63,7 +60,7 @@ function FileCard({ file }: { file: Doc<"files"> }) {
           {file.isFolder ? (
             <FolderSimpleIcon weight="fill" className="size-6 text-primary" />
           ) : (
-            renderFileIcon(file.type)
+            <FileIcon type={file.type} size="md" />
           )}
           <span className="truncate">{file.name}</span>
         </Link>
@@ -84,7 +81,7 @@ function FileCard({ file }: { file: Doc<"files"> }) {
 
 export function ExplorerGridViewSkeleton() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-7 space-y-8">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-7 space-y-8">
       {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="flex flex-col gap-2 rounded-md text-center">
           <Skeleton className="h-52" />
