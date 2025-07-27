@@ -24,13 +24,3 @@ export const getUserById = query({
     return await ctx.db.get(args.userId)
   }
 })
-
-export const getDefaultTeamId = query({
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-
-    const user = await ctx.db.get(userId);
-    return user?.defaultTeamId ?? null;
-  },
-});

@@ -35,12 +35,12 @@ function FileCard({ file }: { file: Doc<"files"> }) {
 
   return (
     <div className={cn("flex flex-col gap-2 rounded-md text-center")}>
-      <div className="border relative grid place-items-center h-52 p-3 rounded-sm bg-card hover:bg-muted">
+      <div className="border relative grid place-items-center h-44 sm:h-52 p-3 rounded-sm bg-card hover:bg-muted">
         <FileActions
           file={file}
           useVerticalIcon
-          buttonVariant="secondary"
-          className="absolute top-2 right-2"
+          buttonVariant="outline"
+          className="absolute top-2 right-2 shadow-none"
         />
         {file.isFolder ? (
           <FolderSimpleIcon
@@ -54,6 +54,7 @@ function FileCard({ file }: { file: Doc<"files"> }) {
             alt={file.name}
             width={500}
             height={500}
+            loading="lazy"
             className="size-full object-contain overflow-hidden rounded-xs"
           />
         ) : (
@@ -99,7 +100,7 @@ export function ExplorerGridViewSkeleton() {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-7 space-y-8">
       {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="flex flex-col gap-2 rounded-md text-center">
-          <Skeleton className="h-52" />
+          <Skeleton className="h-44 sm:h-52" />
           <div className="flex flex-col w-full">
             <div className="flex gap-2 items-center text-sm min-w-0 py-2">
               <Skeleton className="h-4 w-4" />

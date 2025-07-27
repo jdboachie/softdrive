@@ -46,7 +46,7 @@ export default function TeamButton() {
           role="combobox"
           variant="ghost"
           aria-expanded={open}
-          className="min-w-[200px] justify-start px-1.5"
+          className="min-w-[200px] justify-start px-1.5 max-sm:-translate-x-3"
         >
           {value && <Avatar name={team?.name ?? undefined} />}
           {value === undefined ? (
@@ -61,7 +61,7 @@ export default function TeamButton() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="!min-w-[100px] p-0">
+      <PopoverContent className="!min-w-[100px] p-0 max-sm:mx-2">
         <Command>
           <CommandInput placeholder="Search teams..." className="h-9" />
           <CommandList>
