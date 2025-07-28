@@ -35,7 +35,7 @@ function FileCard({ file }: { file: Doc<"files"> }) {
 
   return (
     <div className={cn("flex flex-col gap-2 rounded-md text-center")}>
-      <div className="border relative grid place-items-center h-44 sm:h-52 p-3 rounded-sm bg-card hover:bg-muted">
+      <div className="border relative grid place-items-center h-40 sm:h-52 p-3 rounded-sm bg-card hover:bg-muted">
         <FileActions
           file={file}
           useVerticalIcon

@@ -33,41 +33,74 @@ export const getFiles = query({
       throw new Error("User does not have access to this team")
     }
 
+    const hasSearch = Boolean(args.searchQuery)
     const useTypeFilter = Boolean(args.type)
 
-    const files = await ctx.db
-      .query("files")
-      .withIndex(
-        useTypeFilter
-          ? "by_teamId_parentId_trashed_type"
-          : "by_teamId_parentId_trashed",
-        (q) => {
-          const base = q
-            .eq("teamId", args.teamId)
-            .eq("parentId", args.parentId)
-            .eq("trashed", false)
-
-          return useTypeFilter ? base.eq("type", args.type!) : base
+    const files = await (() => {
+      if (hasSearch) {
+        if (useTypeFilter) {
+          return ctx.db
+            .query("files")
+            .withIndex("by_teamId_trashed_type", (q) =>
+              q
+                .eq("teamId", args.teamId)
+                .eq("trashed", false)
+                .eq("type", args.type!)
+            )
+            .order("desc")
+            .collect()
+        } else {
+          return ctx.db
+            .query("files")
+            .withIndex("by_teamId_trashed", (q) =>
+              q.eq("teamId", args.teamId).eq("trashed", false)
+            )
+            .order("desc")
+            .collect()
         }
-      )
-      .order("desc")
-      .collect()
+      } else {
+        if (useTypeFilter) {
+          return ctx.db
+            .query("files")
+            .withIndex("by_teamId_parentId_trashed_type", (q) =>
+              q
+                .eq("teamId", args.teamId)
+                .eq("parentId", args.parentId)
+                .eq("trashed", false)
+                .eq("type", args.type!)
+            )
+            .order("desc")
+            .collect()
+        } else {
+          return ctx.db
+            .query("files")
+            .withIndex("by_teamId_parentId_trashed", (q) =>
+              q
+                .eq("teamId", args.teamId)
+                .eq("parentId", args.parentId)
+                .eq("trashed", false)
+            )
+            .order("desc")
+            .collect()
+        }
+      }
+    })()
 
-    if (!args.searchQuery) {
-      return files.sort((a, b) => {
+    const sortFiles = (arr: typeof files) =>
+      arr.sort((a, b) => {
         if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
         return (b.updatedAt ?? 0) - (a.updatedAt ?? 0)
       })
+
+    if (!hasSearch) {
+      return sortFiles(files)
     }
 
-    const searchLower = args.searchQuery.toLowerCase()
+    const searchLower = args.searchQuery!.toLowerCase()
 
-    return files
-      .filter((file) => file.name?.toLowerCase().includes(searchLower))
-      .sort((a, b) => {
-        if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
-        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0)
-      })
+    return sortFiles(
+      files.filter((file) => file.name?.toLowerCase().includes(searchLower))
+    )
   },
 })
 

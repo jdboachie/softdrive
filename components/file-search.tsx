@@ -5,6 +5,7 @@ import {
   CommandInput,
   CommandList,
   CommandItem,
+  CommandEmpty,
 } from "@/components/ui/command"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useStableQuery } from "@/hooks/use-stable-query"
@@ -13,10 +14,10 @@ import { useTeam } from "@/hooks/use-team"
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-// import { useDebouncedCallback } from "use-debounce"
 import { Button } from "@/components/ui/button"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { FileIcon } from "./file-icon"
+import { FileActions } from "./file-actions"
 
 export default function FileSearch({
   folderId,
@@ -41,7 +42,7 @@ export default function FileSearch({
       ? {
           teamId: team._id,
           ...(!trash && { parentId: folderId }),
-          searchQuery: searchQuery,
+          searchQuery: searchQuery ?? "",
         }
       : "skip",
   )
@@ -63,7 +64,7 @@ export default function FileSearch({
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
-        <CommandList className="!max-h-92 overflow-y-auto">
+        <CommandList className="!max-h-92 overflow-y-auto p-1">
           {files?.map((file: Doc<"files">) => (
             <CommandItem
               key={file._id}
@@ -73,11 +74,29 @@ export default function FileSearch({
                 if (file.isFolder) router.push(`/t/${team._id}/f/${file._id}`)
                 else if (file.url) router.push(file.url)
               }}
+              className="relative group"
             >
-              <FileIcon type={file.isFolder ? "folder" : file.type} />
-              {file.name}
+              <div className="flex items-center justify-between w-full gap-2">
+                <span className="flex items-center gap-2 truncate max-w-[70%]">
+                  <FileIcon type={file.isFolder ? "folder" : file.type} />
+                  <span className="truncate">{file.name}</span>
+                </span>
+                <div
+                  className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <FileActions file={file} buttonVariant="outline" />
+                </div>
+              </div>
             </CommandItem>
           ))}
+          {!files || files.length === 0 && (
+            <CommandEmpty>
+              No files found. Try searching for something else
+            </CommandEmpty>
+          )}
         </CommandList>
       </CommandDialog>
     </>

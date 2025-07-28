@@ -41,7 +41,7 @@ export default function FileFilters() {
   return (
     <div className="relative flex items-center w-fit">
       <Select value={typeFilter} onValueChange={handleChange}>
-        <SelectTrigger className={`!w-fit max-w-40 bg-background ${typeFilter && 'pr-9'}`}>
+        <SelectTrigger className={`!w-fit max-w-56 bg-background ${typeFilter && 'pr-9'}`}>
           <SelectValue placeholder="Filter by type" />
         </SelectTrigger>
         <SelectContent>

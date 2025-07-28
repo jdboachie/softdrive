@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ChevronDownIcon, LayoutGridIcon } from "lucide-react"
-import { ListDashesIcon } from "@phosphor-icons/react"
+import { ChevronDownIcon, LayoutGridIcon, LogsIcon } from "lucide-react"
 
 const VIEWS = ["list", "grid"] as const
 type ViewType = (typeof VIEWS)[number]
@@ -42,7 +41,7 @@ export function FileViewSelector() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           {view === "list" ? (
-            <ListDashesIcon weight="bold" />
+            <LogsIcon />
           ) : (
             <LayoutGridIcon />
           )}
@@ -58,7 +57,7 @@ export function FileViewSelector() {
             <DropdownMenuItem key={v} onSelect={() => handleChange(v)}>
               {v === "list" ? (
                 <>
-                  <ListDashesIcon weight="bold" />
+                  <LogsIcon />
                   List
                 </>
               ) : (

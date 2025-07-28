@@ -104,8 +104,7 @@ export default function CreateFolderButton() {
         <DialogHeader className="border-b-0">
           <DialogTitle>Create a new folder</DialogTitle>
           <DialogDescription>
-            This will add a nested folder under {parentFolder?.name} in {team?.name}
-            &apos;s drive
+            This will add a folder in {team?.name}&apos;
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -137,7 +136,7 @@ export default function CreateFolderButton() {
                 Cancel
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                Create
+                Create folder
               </Button>
             </DialogFooter>
           </form>
