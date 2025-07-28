@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ChevronDownIcon } from "lucide-react"
-import { ListDashesIcon, SquaresFourIcon } from "@phosphor-icons/react"
+import { ChevronDownIcon, LayoutGridIcon } from "lucide-react"
+import { ListDashesIcon } from "@phosphor-icons/react"
 
 const VIEWS = ["list", "grid"] as const
 type ViewType = (typeof VIEWS)[number]
@@ -44,7 +44,7 @@ export function FileViewSelector() {
           {view === "list" ? (
             <ListDashesIcon weight="bold" />
           ) : (
-            <SquaresFourIcon weight="bold" />
+            <LayoutGridIcon />
           )}
           <ChevronDownIcon className="ml-2" />
           <span className="sr-only">Toggle view</span>
@@ -63,7 +63,7 @@ export function FileViewSelector() {
                 </>
               ) : (
                 <>
-                  <SquaresFourIcon weight="bold" />
+                  <LayoutGridIcon />
                   Grid
                 </>
               )}

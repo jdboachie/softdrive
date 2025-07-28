@@ -47,5 +47,11 @@ export default defineSchema({
   })
     .index("by_teamId", ["teamId"])
     .index("by_teamId_trashed", ["teamId", "trashed"])
-    .index("by_teamId_parentId_trashed", ["teamId", "parentId", "trashed"]),
+    .index("by_teamId_parentId_trashed", ["teamId", "parentId", "trashed"])
+    .index("by_teamId_parentId_trashed_type", [
+      "teamId",
+      "parentId",
+      "trashed",
+      "type",
+    ]),
 })

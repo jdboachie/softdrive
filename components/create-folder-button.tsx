@@ -96,7 +96,7 @@ export default function CreateFolderButton() {
           onClick={() => setDialogOpen(true)}
           className="max-md:w-full"
         >
-          <FolderPlusIcon className="size-5" />
+          <FolderPlusIcon size={32} className="size-5" />
           Create folder
         </Button>
       </DialogTrigger>

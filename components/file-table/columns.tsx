@@ -13,7 +13,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { StarIcon, FolderSimpleIcon } from "@phosphor-icons/react"
+import { StarIcon } from "@phosphor-icons/react"
 
 const commonColumns: ColumnDef<Doc<"files">>[] = [
   // select
@@ -183,15 +183,7 @@ function FileLink({ file }: { file: Doc<"files"> }) {
       }
       className="flex gap-2 items-center w-fit lg:max-w-[65ch] md:max-w-[35ch] hover:underline hover:underline-offset-3 decoration-dotted"
     >
-      {file.isFolder ? (
-        <FolderSimpleIcon
-          size={32}
-          weight="fill"
-          className="size-6 text-primary"
-        />
-      ) : (
-        <FileIcon type={file.type} size="sm" />
-      )}
+      <FileIcon type={file.isFolder ? "folder" : file.type} size="sm" />
       <span className="truncate">{file.name}</span>
     </Link>
   )

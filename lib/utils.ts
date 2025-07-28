@@ -32,3 +32,22 @@ export function formatRelativeDate(timestamp: number) {
     day: "numeric",
   })
 }
+
+export function stringToMimeType(type: string) {
+  switch (type) {
+    case "pdf":
+      return "application/pdf"
+    case "csv":
+      return "text/csv"
+    case "json":
+      return "application/json"
+    case "docx":
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    case "image":
+      return "image/"
+    case "folder":
+      return "folder"
+    default:
+      return type
+  }
+}

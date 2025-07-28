@@ -39,10 +39,10 @@ const Breadcrumbs = () => {
           <Skeleton className="w-36 h-3.5" />
         </div>
       )
-    : capitalize(segments[2] ?? "Home")
+    : capitalize(segments[2] ?? "Drive")
 
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-2 max-md:w-full">
       <Breadcrumb>
         <BreadcrumbList>
           {folder?.parentId &&

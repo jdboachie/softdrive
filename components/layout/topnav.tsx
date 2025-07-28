@@ -7,10 +7,9 @@ import { usePathname } from "next/navigation"
 import { buttonVariants } from "@/components/ui/button"
 
 const links = [
-  { label: "Home", url: "" },
-  { label: "My Drive", url: "/my-drive" },
+  { label: "Drive", url: "" },
   { label: "Trash", url: "/trash" },
-  // { label: "Starred", url: "/starred" },
+  // { label: "Starred", url: "/starred" },0.
   // { label: "Settings", url: "/settings" },
 ]
 

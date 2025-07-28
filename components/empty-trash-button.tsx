@@ -26,7 +26,7 @@ export default function EmptyTrashButton() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button disabled={loading} variant={"outline"} size={'lg'}>
-          <TrashIcon weight="bold" /> Empty Trash
+          <TrashIcon size={32} weight="bold" /> Empty Trash
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

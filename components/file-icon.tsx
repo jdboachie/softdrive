@@ -2,10 +2,11 @@ import {
   BracketsCurlyIcon,
   FileCsvIcon,
   FilePdfIcon,
-  ImageSquareIcon,
   MicrosoftWordLogoIcon,
+  FolderSimpleIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { ImageIcon } from "lucide-react"
 
 interface FileIconProps {
   type: string
@@ -32,6 +33,16 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
 
   if (!type) {
     return <div className={cn("bg-accent rounded-sm", baseClasses)} />
+  }
+
+  if (type === "folder") {
+    return (
+      <FolderSimpleIcon
+        size={iconSize[size]}
+        weight={'fill'}
+        className={cn(baseClasses, "text-primary")}
+      />
+    )
   }
 
   if (type === "application/pdf") {
@@ -64,11 +75,11 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
     )
   }
 
-  if (type === "image/jpeg" || type === "image/png") {
+  if (type.startsWith('image/')) {
     return (
-      <ImageSquareIcon
+      <ImageIcon
         size={iconSize[size]}
-        weight={weight}
+        // weight={weight}
         className={baseClasses}
       />
     )

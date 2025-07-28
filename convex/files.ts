@@ -16,6 +16,7 @@ export const getFiles = query({
     teamId: v.id("teams"),
     parentId: v.optional(v.id("files")),
     searchQuery: v.optional(v.string()),
+    type: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -24,7 +25,7 @@ export const getFiles = query({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
@@ -32,22 +33,29 @@ export const getFiles = query({
       throw new Error("User does not have access to this team")
     }
 
+    const useTypeFilter = Boolean(args.type)
+
     const files = await ctx.db
       .query("files")
-      .withIndex("by_teamId_parentId_trashed", (q) =>
-        q
-          .eq("teamId", args.teamId)
-          .eq("parentId", args.parentId)
-          .eq("trashed", false),
+      .withIndex(
+        useTypeFilter
+          ? "by_teamId_parentId_trashed_type"
+          : "by_teamId_parentId_trashed",
+        (q) => {
+          const base = q
+            .eq("teamId", args.teamId)
+            .eq("parentId", args.parentId)
+            .eq("trashed", false)
+
+          return useTypeFilter ? base.eq("type", args.type!) : base
+        }
       )
       .order("desc")
       .collect()
 
     if (!args.searchQuery) {
       return files.sort((a, b) => {
-        if (a.isFolder !== b.isFolder) {
-          return a.isFolder ? -1 : 1
-        }
+        if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
         return (b.updatedAt ?? 0) - (a.updatedAt ?? 0)
       })
     }
@@ -57,10 +65,8 @@ export const getFiles = query({
     return files
       .filter((file) => file.name?.toLowerCase().includes(searchLower))
       .sort((a, b) => {
-        if (a.isFolder !== b.isFolder) {
-          return a.isFolder ? -1 : 1 // folders first
-        }
-        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0) // newest first
+        if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
+        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0)
       })
   },
 })

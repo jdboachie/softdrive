@@ -1,32 +1,85 @@
 "use client"
 
-import { useRef } from "react"
-import { Input } from "@/components/ui/input"
-import { useDebouncedCallback } from "use-debounce"
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandItem,
+} from "@/components/ui/command"
+import { useHotkeys } from "react-hotkeys-hook"
+import { useStableQuery } from "@/hooks/use-stable-query"
+import { api } from "@/convex/_generated/api"
+import { useTeam } from "@/hooks/use-team"
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
-import { useRouter, useSearchParams } from "next/navigation" //
-// import { Button } from "./ui/button"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+// import { useDebouncedCallback } from "use-debounce"
+import { Button } from "@/components/ui/button"
+import { Doc, Id } from "@/convex/_generated/dataModel"
+import { FileIcon } from "./file-icon"
 
-export default function FileSearch({ placeholder }: { placeholder?: string }) {
+export default function FileSearch({
+  folderId,
+  trash,
+}: {
+  folderId?: Id<"files">
+  trash?: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
   const router = useRouter()
-  const searchQuery = useSearchParams().get("q")
+  const { team } = useTeam()
 
-  const inputRef = useRef<HTMLInputElement>(null)
+  useHotkeys("ctrl+f,cmd+f", (e) => {
+    e.preventDefault()
+    setOpen(true)
+  })
 
-  const handleSearch = useDebouncedCallback(() => {
-    router.push(`?q=${inputRef.current?.value}`)
-  }, 500)
+  const files = useStableQuery(
+    api.files.getFiles,
+    team
+      ? {
+          teamId: team._id,
+          ...(!trash && { parentId: folderId }),
+          searchQuery: searchQuery,
+        }
+      : "skip",
+  )
 
   return (
-    <div className="w-full max-w-md relative rounded-md bg-background">
-      <MagnifyingGlassIcon className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-      <Input
-        className="!px-8 !bg-transparent"
-        placeholder={placeholder ?? "Search files..."}
-        ref={inputRef}
-        onChange={handleSearch}
-        defaultValue={searchQuery ?? undefined}
-      />
-    </div>
+    <>
+      <Button
+        variant="outline"
+        size="icon"
+        className="shadow-none rounded-full"
+        onClick={() => setOpen(true)}
+      >
+        <MagnifyingGlassIcon className="size-4" />
+      </Button>
+
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput
+          placeholder="Search files..."
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+        <CommandList className="!max-h-92 overflow-y-auto">
+          {files?.map((file: Doc<"files">) => (
+            <CommandItem
+              key={file._id}
+              onSelect={() => {
+                setOpen(false)
+                if (!team) return
+                if (file.isFolder) router.push(`/t/${team._id}/f/${file._id}`)
+                else if (file.url) router.push(file.url)
+              }}
+            >
+              <FileIcon type={file.isFolder ? "folder" : file.type} />
+              {file.name}
+            </CommandItem>
+          ))}
+        </CommandList>
+      </CommandDialog>
+    </>
   )
 }
