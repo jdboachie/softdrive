@@ -33,7 +33,7 @@ export const getFiles = query({
       throw new Error("User does not have access to this team")
     }
 
-    const hasSearch = Boolean(args.searchQuery)
+    const hasSearch = args.searchQuery ? true : false
     const useTypeFilter = Boolean(args.type)
 
     const files = await (() => {
