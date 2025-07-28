@@ -17,6 +17,7 @@ import { useFileView } from "@/hooks/use-file-view"
 import { FileViewSelector } from "@/components/file-view-selector"
 import { ColumnVisibilityButton } from "./column-visibility-button"
 import FileCard from "../file-card"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -32,6 +33,7 @@ export function DataTable<TData extends Doc<"files">, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const { view } = useFileView()
+  const mobile = useIsMobile()
 
   const table = useReactTable({
     data,
@@ -95,7 +97,7 @@ export function DataTable<TData extends Doc<"files">, TValue>({
                 {headerGroup.headers.map((header) => {
                   const key = header.column.id
                   if (
-                    view === "grid" &&
+                    (view === "grid" || mobile) &&
                     key !== "name" &&
                     key !== "select" // columnvisibilityview single select
                   )
