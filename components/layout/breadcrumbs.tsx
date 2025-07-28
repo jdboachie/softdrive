@@ -80,7 +80,7 @@ const Breadcrumbs = () => {
           onClick={() => {
             router.back()
           }}
-          className="flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground cursor-pointer"
+          className="w-fit flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground cursor-pointer"
         >
           <ArrowElbowUpLeftIcon />
           Back

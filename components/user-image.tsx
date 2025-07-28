@@ -1,17 +1,29 @@
 import Image from "next/image"
 import { Skeleton } from "./ui/skeleton"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserIcon } from "@phosphor-icons/react"
 
-export default function UserImage ({ src }: { src: string | undefined }) {
-  if (src === undefined) {
-    return <Skeleton className={`rounded-full`} />
-  }
+export default function UserImage({ src }: { src: string | undefined }) {
   return (
-    <Image
-      alt="recommender image"
-      src={src}
-      className={`rounded-full`}
-      width={"500"}
-      height={"500"}
-    />
+    <>
+      {src ? (
+        <Avatar>
+          <AvatarImage asChild>
+            <Image
+              alt="recommender image"
+              src={src}
+              width={500}
+              height={500}
+              className="rounded-full"
+            />
+          </AvatarImage>
+          <AvatarFallback>
+            <UserIcon />
+          </AvatarFallback>
+        </Avatar>
+      ) : (
+        <Skeleton className="w-full h-full rounded-full" />
+      )}
+    </>
   )
 }

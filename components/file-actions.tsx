@@ -70,7 +70,7 @@ export const FileActions = ({
           ) : (
             <DotsThreeIcon weight="bold" className="size-4 text-foreground" />
           )}
-          <span className="sr-only">File actions</span>
+          <span className="sr-only">Actions</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -107,7 +107,13 @@ export const FileActions = ({
             </DropdownMenuItem>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <DropdownMenuItem variant="destructive">
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={(e) => {
+                    // e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                >
                   <FileXIcon weight="bold" />
                   Delete forever
                 </DropdownMenuItem>

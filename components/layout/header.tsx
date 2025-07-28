@@ -17,7 +17,7 @@ export default function Header() {
           </div>
           <TeamButton />
         </div>
-        <div className="flex items-center w-fit gap-2">
+        <div className="flex items-center w-fit gap-2 sm:gap-4">
           <FileSearch />
           <UserButton />
         </div>

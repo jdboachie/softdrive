@@ -5,7 +5,7 @@ import {
   CommandInput,
   CommandEmpty,
 } from "@/components/ui/command"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useDebouncedCallback } from "use-debounce"
 import { api } from "@/convex/_generated/api"
@@ -30,16 +30,7 @@ export default function FileSearch({
   const router = useRouter()
   const { team } = useTeam()
 
-  const [isMac, setIsMac] = useState(false)
-
-  useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      const isMacLike = navigator.userAgent.includes("Mac");
-      setIsMac(isMacLike);
-    }
-  }, []);
-
-  useHotkeys("ctrl+f,cmd+f", (e) => {
+  useHotkeys("f", (e) => {
     e.preventDefault()
     setOpen(true)
   })
@@ -77,9 +68,9 @@ export default function FileSearch({
         className="flex max-md:hidden items-center space-x-2 rounded-lg border px-3 pr-2 py-1.5 text-sm text-muted-foreground transition"
       >
         <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground pr-4 ">Find…</span>
+        <span className="text-sm text-muted-foreground pr-4 ">Search…</span>
         <kbd className="ml-auto rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground">
-          {isMac ? "⌘" : "Ctrl"} + F
+          F
         </kbd>
       </span>
 

@@ -10,7 +10,7 @@ export default function TitleBlock({
 }) {
   return (
     <div className="border-b">
-      <div className="w-full flex max-md:flex-col gap-6 items-center justify-start md:justify-between p-6 px-3 md:px-6 containor mx-auto">
+      <div className="w-full flex max-sm:flex-col gap-6 items-center justify-start md:justify-between p-6 px-3 md:px-6 containor mx-auto">
         {title ? (
           <h1 className="text-3xl font-medium">{title}</h1>
         ) : (

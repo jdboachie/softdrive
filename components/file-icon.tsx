@@ -40,7 +40,7 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
       <FolderSimpleIcon
         size={iconSize[size]}
         weight={'fill'}
-        className={cn(baseClasses, "text-primary")}
+        className={cn(baseClasses, "text-primary size-4.5")}
       />
     )
   }

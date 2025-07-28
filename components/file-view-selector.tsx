@@ -10,9 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ChevronDownIcon, LayoutGridIcon, LogsIcon } from "lucide-react"
+import { useFileView } from "@/hooks/use-file-view"
 
 const VIEWS = ["list", "grid"] as const
 type ViewType = (typeof VIEWS)[number]
@@ -20,41 +20,30 @@ type ViewType = (typeof VIEWS)[number]
 const LOCAL_STORAGE_KEY = "file_view"
 
 export function FileViewSelector() {
-  const router = useRouter()
-  const [view, setView] = React.useState<ViewType>("list")
+  const { view, changeView } = useFileView()
 
   React.useEffect(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
     if (saved && VIEWS.includes(saved as ViewType)) {
-      setView(saved as ViewType)
+      changeView(saved as ViewType)
     }
-  }, [])
-
-  const handleChange = (value: ViewType) => {
-    setView(value)
-    localStorage.setItem(LOCAL_STORAGE_KEY, value)
-    router.push(`?view=${value}`, { scroll: false })
-  }
+  }, [changeView])
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          {view === "list" ? (
-            <LogsIcon />
-          ) : (
-            <LayoutGridIcon />
-          )}
+          {view === "list" ? <LogsIcon /> : <LayoutGridIcon />}
           <ChevronDownIcon className="ml-2" />
           <span className="sr-only">Toggle view</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-        <DropdownMenuLabel>File view</DropdownMenuLabel>
-        <DropdownMenuSeparator/>
+          <DropdownMenuLabel>File view</DropdownMenuLabel>
+          <DropdownMenuSeparator />
           {VIEWS.map((v) => (
-            <DropdownMenuItem key={v} onSelect={() => handleChange(v)}>
+            <DropdownMenuItem key={v} onSelect={() => changeView(v)}>
               {v === "list" ? (
                 <>
                   <LogsIcon />
@@ -72,22 +61,4 @@ export function FileViewSelector() {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
-
-export function useFileView() {
-  const [view, setView] = React.useState<ViewType>("list")
-
-  React.useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
-    if (saved && VIEWS.includes(saved as ViewType)) {
-      setView(saved as ViewType)
-    }
-  }, [])
-
-  const changeView = (value: ViewType) => {
-    setView(value)
-    localStorage.setItem(LOCAL_STORAGE_KEY, value)
-  }
-
-  return { view, changeView }
 }

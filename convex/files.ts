@@ -211,6 +211,36 @@ export const createFile = mutation({
   },
 })
 
+export const renameFile = mutation({
+  args: {
+    teamId: v.id("teams"),
+    fileId: v.id("files"),
+    newName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
+
+    const file = await ctx.db.get(args.fileId)
+    if (!file) throw new Error("File not found")
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId),
+      )
+      .unique()
+
+    if (!membership || membership.role === "read") {
+      throw new Error("No permission to rename this file")
+    }
+
+    await ctx.db.patch(args.fileId, {
+      name: args.newName,
+    })
+  },
+})
+
 export const toggleFileIsStarred = mutation({
   args: {
     fileId: v.id("files"),

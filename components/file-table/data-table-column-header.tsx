@@ -59,7 +59,12 @@ export function DataTableColumnHeader<TData, TValue>({
             <ArrowDownIcon />
             Desc
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={column.getIsSorted() === false} onClick={() => column.toggleSorting(undefined)}>
+          <DropdownMenuItem
+            disabled={column.getIsSorted() === false}
+            onClick={() => {
+              column.clearSorting()
+            }}
+          >
             <XIcon />
             Clear sorting
           </DropdownMenuItem>

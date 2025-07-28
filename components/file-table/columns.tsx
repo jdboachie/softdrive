@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { toast } from "sonner"
+import * as React from "react"
 import { Button } from "../ui/button"
 import { Checkbox } from "../ui/checkbox"
 import { FileIcon } from "../file-icon"
@@ -13,7 +14,13 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { formatBytes, formatRelativeDate } from "@/lib/utils"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { StarIcon } from "@phosphor-icons/react"
+import { StarIcon, PencilSimpleLineIcon } from "@phosphor-icons/react"
+import { Input } from "@/components/ui/input"
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip"
 
 const commonColumns: ColumnDef<Doc<"files">>[] = [
   // select
@@ -56,9 +63,7 @@ const commonColumns: ColumnDef<Doc<"files">>[] = [
         className="text-right w-full"
       />
     ),
-    cell: ({ row }) => {
-      return <FileLink file={row.original} />
-    },
+    cell: ({ row }) => <EditableFileName file={row.original} />,
   },
   // favorite
   {
@@ -80,10 +85,8 @@ const commonColumns: ColumnDef<Doc<"files">>[] = [
       <DataTableColumnHeader column={column} title="Size" />
     ),
     cell: ({ row }) => {
-      if (row.original.isFolder)
-        return null
-      if (!row.original.size)
-        return null
+      if (row.original.isFolder) return null
+      if (!row.original.size) return null
       return <>{formatBytes(row.getValue("size"))}</>
     },
   },
@@ -147,7 +150,7 @@ function FavoriteButton({
   favorite: boolean
 }) {
   const { team, loading } = useTeam()
-  const [pending, setPending] = useState<boolean>()
+  const [pending, setPending] = React.useState<boolean>()
   const toggleFileIsStarred = useMutation(api.files.toggleFileIsStarred)
 
   return (
@@ -186,5 +189,81 @@ function FileLink({ file }: { file: Doc<"files"> }) {
       <FileIcon type={file.isFolder ? "folder" : file.type} size="sm" />
       <span className="truncate">{file.name}</span>
     </Link>
+  )
+}
+
+export function EditableFileName({ file }: { file: Doc<"files"> }) {
+  const { team } = useTeam()
+  const renameFile = useMutation(api.files.renameFile)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [editing, setEditing] = React.useState(false)
+  const [name, setName] = React.useState(file.name)
+
+  const handleRename = () => {
+    if (!team || name === file.name) {
+      setEditing(false)
+      return
+    }
+    toast.promise(
+      renameFile({ teamId: team._id, fileId: file._id, newName: name }).then(
+        () => setEditing(false),
+      ),
+      {
+        loading: "Renaming...",
+        success: "Renamed successfully",
+        error: "Rename failed",
+      },
+    )
+  }
+  React.useEffect(() => {
+    if (editing && inputRef.current) {
+      const dotIndex = name.lastIndexOf(".")
+      const end = dotIndex > 0 ? dotIndex : name.length
+      inputRef.current.setSelectionRange(0, end)
+    }
+  }, [editing, name])
+
+  return (
+    <div className="group relative flex items-center gap-1 w-full">
+      {editing ? (
+        <div className="size-full flex items-center gap-2">
+          <FileIcon type={file.isFolder ? "folder" : file.type} size="sm" />
+          <Input
+            value={name}
+            ref={inputRef}
+            placeholder={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={(e) => {
+              e.stopPropagation()
+              handleRename()
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur()
+            }}
+            autoFocus
+            className="bg-transparent -ml-[5px] px-1 text-sm"
+          />
+        </div>
+      ) : (
+        <>
+          <FileLink file={file} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditing(true)}
+                className="!size-7 opacity-0 group-hover:opacity-100 text-muted-foreground text-sm ml-4"
+              >
+                <PencilSimpleLineIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" align="center">
+              Rename
+            </TooltipContent>
+          </Tooltip>
+        </>
+      )}
+    </div>
   )
 }
