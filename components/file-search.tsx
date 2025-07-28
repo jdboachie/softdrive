@@ -3,16 +3,15 @@
 import {
   CommandDialog,
   CommandInput,
-  CommandList,
-  CommandItem,
   CommandEmpty,
 } from "@/components/ui/command"
+import { useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-import { useStableQuery } from "@/hooks/use-stable-query"
+import { useDebouncedCallback } from "use-debounce"
 import { api } from "@/convex/_generated/api"
 import { useTeam } from "@/hooks/use-team"
+import { useStableQuery } from "@/hooks/use-stable-query"
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Doc, Id } from "@/convex/_generated/dataModel"
@@ -31,10 +30,26 @@ export default function FileSearch({
   const router = useRouter()
   const { team } = useTeam()
 
+  const [isMac, setIsMac] = useState(false)
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      const isMacLike = navigator.userAgent.includes("Mac");
+      setIsMac(isMacLike);
+    }
+  }, []);
+
   useHotkeys("ctrl+f,cmd+f", (e) => {
     e.preventDefault()
     setOpen(true)
   })
+
+  const handleSelect = useDebouncedCallback((file: Doc<"files">) => {
+    setOpen(false)
+    if (!team) return
+    if (file.isFolder) router.push(`/t/${team._id}/f/${file._id}`)
+    else if (file.url) router.push(file.url)
+  }, 200)
 
   const files = useStableQuery(
     api.files.getFiles,
@@ -52,11 +67,21 @@ export default function FileSearch({
       <Button
         variant="outline"
         size="icon"
-        className="shadow-none rounded-full"
+        className="shadow-none rounded-full visible md:hidden"
         onClick={() => setOpen(true)}
       >
         <MagnifyingGlassIcon className="size-4" />
       </Button>
+      <span
+        onClick={() => setOpen(true)}
+        className="flex max-md:hidden items-center space-x-2 rounded-lg border px-3 pr-2 py-1.5 text-sm text-muted-foreground transition"
+      >
+        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground pr-4 ">Find…</span>
+        <kbd className="ml-auto rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground">
+          {isMac ? "⌘" : "Ctrl"} + F
+        </kbd>
+      </span>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
@@ -64,17 +89,12 @@ export default function FileSearch({
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
-        <CommandList className="!max-h-92 overflow-y-auto p-1">
+        <div className="scroll-py-1 overflow-x-hidden !max-h-92 overflow-y-auto p-1">
           {files?.map((file: Doc<"files">) => (
-            <CommandItem
+            <div
               key={file._id}
-              onSelect={() => {
-                setOpen(false)
-                if (!team) return
-                if (file.isFolder) router.push(`/t/${team._id}/f/${file._id}`)
-                else if (file.url) router.push(file.url)
-              }}
-              className="relative group"
+              onSelect={() => handleSelect(file)}
+              className="group hover:bg-accent data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm p-2 py-2.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             >
               <div className="flex items-center justify-between w-full gap-2">
                 <span className="flex items-center gap-2 truncate max-w-[70%]">
@@ -90,14 +110,15 @@ export default function FileSearch({
                   <FileActions file={file} buttonVariant="outline" />
                 </div>
               </div>
-            </CommandItem>
+            </div>
           ))}
-          {!files || files.length === 0 && (
-            <CommandEmpty>
-              No files found. Try searching for something else
-            </CommandEmpty>
-          )}
-        </CommandList>
+          {!files ||
+            (files.length === 0 && (
+              <CommandEmpty>
+                No files found. Try searching for something else
+              </CommandEmpty>
+            ))}
+        </div>
       </CommandDialog>
     </>
   )
