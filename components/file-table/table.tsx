@@ -136,6 +136,13 @@ export function DataTable<TData extends Doc<"files">, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => {
                     const key = cell.column.id
+                    if (
+                      mobile &&
+                      key !== "name" &&
+                      key !== "select" &&
+                      key !== "actions"
+                    )
+                      return
                     const className = getColumnClass(key)
                     return (
                       <div key={cell.id} className={className}>

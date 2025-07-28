@@ -184,7 +184,7 @@ function FileLink({ file }: { file: Doc<"files"> }) {
             ? file.url
             : "#"
       }
-      className="flex gap-2 items-center w-fit lg:max-w-[65ch] md:max-w-[35ch] hover:underline hover:underline-offset-3 decoration-dotted"
+      className="flex gap-2 items-center w-fit lg:max-w-[65ch] max-lg:max-w-[35ch] max-sm:max-w-[20ch] hover:underline hover:underline-offset-3 decoration-dotted"
     >
       <FileIcon type={file.isFolder ? "folder" : file.type} size="sm" />
       <span className="truncate">{file.name}</span>
@@ -252,7 +252,10 @@ export function EditableFileName({ file }: { file: Doc<"files"> }) {
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => setEditing(true)}
+                onClick={(e) => {
+                  setEditing(true)
+                  e.stopPropagation()
+                }}
                 className="!size-7 opacity-0 group-hover:opacity-100 text-muted-foreground text-sm ml-4"
               >
                 <PencilSimpleLineIcon />
