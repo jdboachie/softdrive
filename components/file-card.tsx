@@ -59,7 +59,7 @@ export default function FileCard({
               : "#"
         }
         data-state={state}
-        className="cursor-pointer border grid place-items-center h-40 sm:h-52 p-3 rounded-sm bg-card data-[state=selected]:bg-muted"
+        className="cursor-pointer border grid place-items-center h-40 sm:h-52 p-3 rounded-md bg-card data-[state=selected]:bg-muted"
       >
         {file.isFolder ? (
           <FolderSimpleIcon
