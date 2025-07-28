@@ -40,7 +40,7 @@ export default function FileCard({
         <Checkbox
           checked={state === "selected"}
           onCheckedChange={toggleChecked}
-          className="text-primary-foreground size-6.5 rounded-md border-foreground/70 backdrop-blur-xs"
+          className="text-primary-foreground size-6.5 rounded-md border-foreground/70"
         />
         <FileActions
           file={file}
