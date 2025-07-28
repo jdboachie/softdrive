@@ -15,19 +15,9 @@ import { ChevronDownIcon, LayoutGridIcon, LogsIcon } from "lucide-react"
 import { useFileView } from "@/hooks/use-file-view"
 
 const VIEWS = ["list", "grid"] as const
-type ViewType = (typeof VIEWS)[number]
-
-const LOCAL_STORAGE_KEY = "file_view"
 
 export function FileViewSelector() {
   const { view, changeView } = useFileView()
-
-  React.useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
-    if (saved && VIEWS.includes(saved as ViewType)) {
-      changeView(saved as ViewType)
-    }
-  }, [changeView])
 
   return (
     <DropdownMenu>
