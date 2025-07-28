@@ -9,13 +9,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useQuery } from "convex/react"
 import { SlashIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ArrowElbowUpLeftIcon } from "@phosphor-icons/react"
+import { useStableQuery } from "@/hooks/use-stable-query"
 
 const capitalize = (s: string) =>
   s.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
@@ -27,7 +27,7 @@ const Breadcrumbs = () => {
 
   const isFolder = segments[2] === "f"
   const folderId = isFolder ? segments[3] : null
-  const folder = useQuery(
+  const folder = useStableQuery(
     api.files.getFileById,
     folderId ? { id: folderId as Id<"files"> } : "skip",
   )

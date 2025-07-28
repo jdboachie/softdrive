@@ -1,7 +1,6 @@
 "use client"
 
 import { useTeam } from "@/hooks/use-team"
-import { useQuery } from "convex/react" //usePaginatedQuery,
 import { api } from "@/convex/_generated/api"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { DataTable, DataTableSkeleton } from "@/components/file-table/table"
@@ -10,6 +9,7 @@ import { useSearchParams } from "next/navigation"
 import FileSearch from "@/components/file-search"
 import { FileViewSelector, useFileView } from "./file-view"
 import { ExplorerGridView, ExplorerGridViewSkeleton } from "./explorer-grid-view"
+import { useStableQuery } from "@/hooks/use-stable-query"
 
 // const PAGE_SIZE = 50
 
@@ -43,7 +43,7 @@ export default function FileExplorerView({
   const resolvedColumns = trash ? trashColumns : columns
   const endpoint = trash ? api.files.getTrashedFiles : api.files.getFiles
 
-  const files = useQuery(
+  const files = useStableQuery(
     endpoint,
     team
       ? {
