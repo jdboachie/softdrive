@@ -13,7 +13,7 @@ import { useQuery } from "convex/react"
 import { SignOutButton } from "./signout"
 import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
-import UserImage from "../user-image"
+import UserImage from "./user-image"
 import { Skeleton } from "../ui/skeleton"
 import { GearFineIcon, UserIcon } from "@phosphor-icons/react"
 

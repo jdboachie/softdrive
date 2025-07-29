@@ -4,7 +4,7 @@ import { TabsIcon } from "@phosphor-icons/react/dist/ssr"
 import TeamButton from "@/components/auth/team-button"
 import TopNav from "./topnav"
 import { Skeleton } from "@/components/ui/skeleton"
-import FileSearch from "../file-search"
+import FileSearch from "../file-ui/file-search"
 
 export default function Header() {
   return (

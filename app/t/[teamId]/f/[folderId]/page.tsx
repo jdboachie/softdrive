@@ -1,5 +1,5 @@
 import { Id } from "@/convex/_generated/dataModel"
-import FileExplorerView from "@/components/file-explorer-view"
+import FileExplorerView from "@/components/file-ui/file-explorer-view"
 
 export default async function Page({
   params,

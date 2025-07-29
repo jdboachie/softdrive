@@ -29,7 +29,7 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
 
   const weight = size === "md" ? "bold" : size === "sm" ? "regular" : "thin"
 
-  const baseClasses = cn("shrink-0", sizeClasses[size], className)
+  const baseClasses = cn("shrink-0 text-foreground", sizeClasses[size], className)
 
   if (!type) {
     return <div className={cn("bg-accent rounded-sm", baseClasses)} />
@@ -40,7 +40,7 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
       <FolderSimpleIcon
         size={iconSize[size]}
         weight={'fill'}
-        className={cn(baseClasses, "text-primary size-4.5")}
+        className={cn(baseClasses, "!text-primary")}
       />
     )
   }

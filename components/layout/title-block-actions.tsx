@@ -1,9 +1,9 @@
 "use client"
 
-import UploadButton from "../upload-button"
+import UploadButton from "../action-buttons/upload-button"
 import { usePathname } from "next/navigation"
-import EmptyTrashButton from "../empty-trash-button"
-import CreateFolderButton from "../create-folder-button"
+import EmptyTrashButton from "../action-buttons/empty-trash-button"
+import CreateFolderButton from "../action-buttons/create-folder-button"
 
 export default function TitleBlockActions() {
   const pathname = usePathname()

@@ -69,12 +69,12 @@ export default function FileSearch({
       >
         <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm text-muted-foreground pr-4 ">Search…</span>
-        <kbd className="ml-auto rounded border bg-background px-1.5 py-0.5 text-xs text-muted-foreground">
+        <kbd className="ml-auto rounded border bg-background px-1.5 py-0.5 text-xs text-foreground">
           F
         </kbd>
       </span>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={open} onOpenChange={setOpen} showCloseButton={false}>
         <CommandInput
           placeholder="Search files..."
           value={searchQuery}

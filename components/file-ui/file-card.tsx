@@ -8,7 +8,7 @@ import { FileActions } from "./file-actions"
 import { Doc } from "@/convex/_generated/dataModel"
 import { FolderSimpleIcon } from "@phosphor-icons/react"
 import { cn, formatBytes, formatRelativeDate } from "@/lib/utils"
-import { Checkbox } from "./ui/checkbox"
+import { Checkbox } from "../ui/checkbox"
 
 // Helper function to check if file type is an image
 function isImageFile(fileType: string): boolean {

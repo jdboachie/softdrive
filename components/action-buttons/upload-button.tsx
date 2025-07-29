@@ -30,7 +30,7 @@ import { useTeam } from "@/hooks/use-team"
 import { UploadIcon } from "@phosphor-icons/react"
 import { usePathname } from "next/navigation"
 import { Id } from "@/convex/_generated/dataModel"
-import { FileIcon } from "./file-icon"
+import { FileIcon } from "../file-ui/file-icon"
 
 const formSchema = z.object({
   files: z

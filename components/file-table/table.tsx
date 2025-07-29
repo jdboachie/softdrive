@@ -10,13 +10,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import FileFilters from "@/components/file-filters"
+import FileFilters from "@/components/file-ui/file-filters"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Doc } from "@/convex/_generated/dataModel"
 import { useFileView } from "@/hooks/use-file-view"
-import { FileViewSelector } from "@/components/file-view-selector"
+import { FileViewSelector } from "@/components/file-ui/file-view-selector"
 import { ColumnVisibilityButton } from "./column-visibility-button"
-import FileCard from "../file-card"
+import FileCard from "../file-ui/file-card"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 interface DataTableProps<TData, TValue> {

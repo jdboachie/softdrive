@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import { TrashIcon } from "@phosphor-icons/react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
