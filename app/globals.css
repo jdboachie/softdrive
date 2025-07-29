@@ -149,6 +149,10 @@
     @apply bg-ground text-foreground;
   }
 
+  kbd {
+    @apply inline-flex items-center justify-center rounded border bg-background px-1.5 py-0.5 text-xs tracking-tighter font-mono text-foreground;
+  }
+
   .containor {
     @apply max-w-[1440px] mx-auto 2xl:container;
   }

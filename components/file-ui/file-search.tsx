@@ -69,17 +69,20 @@ export default function FileSearch({
       >
         <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm text-muted-foreground pr-4 ">Search…</span>
-        <kbd className="ml-auto rounded border bg-background px-1.5 py-0.5 text-xs text-foreground">
+        <kbd className="ml-auto">
           F
         </kbd>
       </span>
 
       <CommandDialog open={open} onOpenChange={setOpen} showCloseButton={false}>
-        <CommandInput
-          placeholder="Search files..."
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-        />
+        <div className="grid relative w-full">
+          <CommandInput
+            placeholder="Search files..."
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+          />
+          <kbd className="absolute top-3 right-3">Esc</kbd>
+        </div>
         <div className="scroll-py-1 overflow-x-hidden !max-h-92 overflow-y-auto p-1">
           {files?.map((file: Doc<"files">) => (
             <div
@@ -89,7 +92,7 @@ export default function FileSearch({
             >
               <div className="flex items-center justify-between w-full gap-2">
                 <span className="flex items-center gap-2 truncate max-w-[85%]">
-                  <FileIcon type={file.isFolder ? "folder" : file.type} />
+                  <FileIcon size="sm" type={file.isFolder ? "folder" : file.type} />
                   <span className="truncate">{file.name}</span>
                 </span>
                 <div
