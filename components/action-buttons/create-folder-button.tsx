@@ -110,15 +110,15 @@ export default function CreateFolderButton() {
         <DialogHeader className="border-b-0">
           <DialogTitle>Create a new folder</DialogTitle>
           <DialogDescription>
-            This will add a folder to <b>{team?.name}</b>
+            This will add a folder under <span className="font-medium">{team?.name}</span>
             {parentFolder
               ? <>
                   {' / '}
-                  <b>
+                  <span className="font-medium">
                     {parentFolder.breadcrumbs?.map(crumb => crumb.folderName).join(' / ')}
                     {parentFolder.breadcrumbs?.length ? ' / ' : ''}
                     {parentFolder.name}
-                  </b>
+                  </span>
                 </>
               : <b> / </b>
             } in your file system.
