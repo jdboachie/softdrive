@@ -89,6 +89,12 @@ export default function UploadButton() {
             path: parentFolder ? parentFolder.path + '/' + file.name : file.name,
             storageId,
             parentId: folderId || undefined,
+            breadcrumbs: parentFolder
+              ? [
+                  ...(parentFolder.breadcrumbs ?? []),
+                  { folderId: parentFolder._id, folderName: parentFolder.name },
+                ]
+              : [],
           })
         }),
       ),

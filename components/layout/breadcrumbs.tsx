@@ -1,27 +1,26 @@
 "use client"
 
 import Link from "next/link"
+import * as React from "react"
+import { usePathname } from "next/navigation"
+import { SlashIcon } from "lucide-react"
+import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
+import { useStableQuery } from "@/hooks/use-stable-query"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { SlashIcon } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowElbowUpLeftIcon } from "@phosphor-icons/react"
-import { useStableQuery } from "@/hooks/use-stable-query"
+import { TreeViewIcon } from "@phosphor-icons/react"
 
 const capitalize = (s: string) =>
   s.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 
 const Breadcrumbs = () => {
-  const router = useRouter()
   const pathname = usePathname()
   const segments = pathname.split("/").filter(Boolean)
 
@@ -33,64 +32,62 @@ const Breadcrumbs = () => {
   )
 
   const label = isFolder
-    ? folder?.name || (
-        <div className="flex flex-col gap-2.5">
-          <Skeleton className="w-52 h-9" />
-          <Skeleton className="w-36 h-3.5" />
-        </div>
-      )
+    ? folder?.name || <Skeleton className="w-52 h-9" />
     : capitalize(segments[2] ?? "Drive")
+
+  const crumbs = folder?.breadcrumbs ?? []
 
   return (
     <div className="flex flex-col gap-2 max-md:w-full">
-      <Breadcrumb>
-        <BreadcrumbList>
-          {folder?.parentId &&
-            (() => {
-              const chips = folder.path.split("/")
-              const pathDepth = chips.length
-              const parentFolder = chips[pathDepth - 2]
-              return (
-                <>
-                  <BreadcrumbItem className="text-3xl font-medium">
+      <h1 className="text-3xl font-medium">{label}</h1>
+      {segments[2] === "f" && segments.length >= 4 && (
+        <div className="flex items-center justify-center w-fit h-fit gap-1.5">
+          <TreeViewIcon className="text-muted-foreground size-3" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link
+                    prefetch
+                    href={`/t/${segments[1]}`}
+                    className="text-muted-foreground text-xs hover:text-foreground font-medium"
+                  >
+                    All files
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+
+              {crumbs.length > 0 && (
+                <BreadcrumbSeparator>
+                  <SlashIcon className="text-muted-foreground stroke-[1.5] size-3" />
+                </BreadcrumbSeparator>
+              )}
+
+              {crumbs.map((crumb, index) => (
+                <React.Fragment key={crumb.folderId}>
+                  <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link
                         prefetch
-                        href={`/t/${segments[1]}/f/${folder.parentId}`}
+                        href={`/t/${segments[1]}/f/${crumb.folderId}`}
+                        className="text-muted-foreground text-xs hover:text-foreground font-medium"
                       >
-                        {parentFolder}
+                        {crumb.folderName}
                       </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator className="[&>svg]:size-6">
-                    <SlashIcon className="text-muted-foreground stroke-[1.5]" />
-                  </BreadcrumbSeparator>
-                </>
-              )
-            })()}
-          <BreadcrumbItem>
-            <BreadcrumbPage className="text-3xl font-medium">
-              {label}
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      {isFolder && folder && (
-        <div
-          onClick={() => {
-            router.back()
-          }}
-          className="w-fit flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground cursor-pointer"
-        >
-          <ArrowElbowUpLeftIcon />
-          Back
+                  {index < crumbs.length - 1 && (
+                    <BreadcrumbSeparator>
+                      <SlashIcon className="text-muted-foreground stroke-[1.5] size-3" />
+                    </BreadcrumbSeparator>
+                  )}
+                </React.Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       )}
-      {segments[2] === "my-drive" && (
-        <span className="text-xs text-muted-foreground">
-          These are your personal files
-        </span>
-      )}
+
       {segments[2] === "trash" && (
         <span className="text-xs text-muted-foreground">
           Items in trash are deleted automatically after 30 days

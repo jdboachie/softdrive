@@ -33,7 +33,15 @@ export default defineSchema({
     name: v.string(),
     size: v.optional(v.number()),
     type: v.string(),
-    path: v.string(),
+    path: v.optional(v.string()),
+    breadcrumbs: v.optional(
+      v.array(
+        v.object({
+          folderId: v.id("files"),
+          folderName: v.string(),
+        })
+      )
+    ),
     teamId: v.id("teams"),
     authorId: v.id("users"),
     isFolder: v.boolean(),

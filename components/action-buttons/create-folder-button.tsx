@@ -41,11 +41,11 @@ export default function CreateFolderButton() {
   const createFile = useMutation(api.files.createFile)
 
   const pathname = usePathname()
-  const folderId = pathname.split("/")[4] as Id<"files"> // /t/teamId/f/folderId
+  const folderId = pathname.split("/")[4] as Id<"files">
 
   const parentFolder = useQuery(
     api.files.getFileById,
-    folderId ? { id: folderId } : "skip",
+    folderId ? { id: folderId } : "skip"
   )
 
   const [dialogOpen, setDialogOpen] = React.useState(false)
@@ -73,7 +73,13 @@ export default function CreateFolderButton() {
           teamId: team._id,
           isFolder: true,
           parentId: folderId,
-          path: parentFolder ? parentFolder.path + '/' + values.name : values.name,
+          path: parentFolder?.path ? parentFolder.path + '/' + values.name : values.name,
+          breadcrumbs: parentFolder
+            ? [
+                ...(parentFolder.breadcrumbs ?? []),
+                { folderId: parentFolder._id, folderName: parentFolder.name },
+              ]
+            : [],
         })
 
         if (newFolderId) router.push(`/t/${team._id}/f/${newFolderId}`)
@@ -82,7 +88,7 @@ export default function CreateFolderButton() {
         loading: "Creating folder...",
         success: "Folder created",
         error: "Failed to create folder",
-      },
+      }
     )
   }
 
@@ -104,7 +110,18 @@ export default function CreateFolderButton() {
         <DialogHeader className="border-b-0">
           <DialogTitle>Create a new folder</DialogTitle>
           <DialogDescription>
-            This will add a folder in {team?.name}&apos;
+            This will add a folder to <b>{team?.name}</b>
+            {parentFolder
+              ? <>
+                  {' / '}
+                  <b>
+                    {parentFolder.breadcrumbs?.map(crumb => crumb.folderName).join(' / ')}
+                    {parentFolder.breadcrumbs?.length ? ' / ' : ''}
+                    {parentFolder.name}
+                  </b>
+                </>
+              : <b> / </b>
+            } in your file system.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -135,7 +152,13 @@ export default function CreateFolderButton() {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={
+                  form.formState.isSubmitting ||
+                  !form.watch("name")?.trim()
+                }
+              >
                 Create folder
               </Button>
             </DialogFooter>

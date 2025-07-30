@@ -18,10 +18,23 @@ import { FileViewSelector } from "@/components/file-ui/file-view-selector"
 import { ColumnVisibilityButton } from "./column-visibility-button"
 import FileCard from "../file-ui/file-card"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import { useTeam } from "@/hooks/use-team"
+import { cn } from "@/lib/utils"
+import { FileIcon } from "../file-ui/file-icon"
+import { renderToString } from "react-dom/server"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+}
+
+// Helper function to render FileIcon to string for drag preview
+function renderFileIconToString(type: string, isFolder: boolean) {
+  const iconType = isFolder ? "folder" : type
+  const iconElement = <FileIcon type={iconType} size="sm" />
+  return renderToString(iconElement)
 }
 
 export function DataTable<TData extends Doc<"files">, TValue>({
@@ -34,6 +47,10 @@ export function DataTable<TData extends Doc<"files">, TValue>({
     React.useState<VisibilityState>({})
   const { view } = useFileView()
   const mobile = useIsMobile()
+  const moveFile = useMutation(api.files.moveFile)
+  const { team } = useTeam()
+  const [dragOverRow, setDragOverRow] = React.useState<string | null>(null)
+  const [draggingRow, setDraggingRow] = React.useState<string | null>(null)
 
   const table = useReactTable({
     data,
@@ -67,6 +84,102 @@ export function DataTable<TData extends Doc<"files">, TValue>({
     }
   }
 
+  const handleDragStart = (e: React.DragEvent, file: Doc<"files">) => {
+    e.dataTransfer.setData("application/json", JSON.stringify({
+      fileId: file._id,
+      fileName: file.name,
+      isFolder: file.isFolder
+    }))
+    e.dataTransfer.effectAllowed = "move"
+    setDraggingRow(file._id)
+
+    // Create custom drag preview
+    const dragPreview = document.createElement("div")
+    dragPreview.style.cssText = `
+      position: fixed;
+      top: -1000px;
+      left: -1000px;
+      background: hsl(var(--background));
+      border: 1px solid hsl(var(--border));
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: hsl(var(--foreground));
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      z-index: 9999;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      backdrop-filter: blur(8px);
+      border: 1px solid hsl(var(--border) / 0.2);
+    `
+
+    // Use FileIcon component instead of hardcoded SVG
+    const iconHtml = renderFileIconToString(file.type, file.isFolder)
+
+    dragPreview.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 12px;">
+        ${iconHtml}
+        <span style="overflow: hidden; text-overflow: ellipsis; font-weight: 500;">${file.name}</span>
+      </div>
+    `
+
+    document.body.appendChild(dragPreview)
+    e.dataTransfer.setDragImage(dragPreview, 0, 0)
+
+    // Clean up the preview element after a short delay
+    setTimeout(() => {
+      if (document.body.contains(dragPreview)) {
+        document.body.removeChild(dragPreview)
+      }
+    }, 100)
+  }
+
+  const handleDragEnd = () => {
+    setDraggingRow(null)
+  }
+
+  const handleDragOver = (e: React.DragEvent, file: Doc<"files">) => {
+    if (file.isFolder) {
+      e.preventDefault()
+      e.dataTransfer.dropEffect = "move"
+      setDragOverRow(file._id)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setDragOverRow(null)
+  }
+
+  const handleDrop = async (e: React.DragEvent, file: Doc<"files">) => {
+    e.preventDefault()
+    setDragOverRow(null)
+
+    if (!file.isFolder || !team) return
+
+    try {
+      const data = e.dataTransfer.getData("application/json")
+      if (!data) return
+
+      const { fileId } = JSON.parse(data)
+
+      // Don't allow dropping a file onto itself
+      if (fileId === file._id) return
+
+      await moveFile({
+        fileId,
+        newParentId: file._id,
+        teamId: team._id
+      })
+    } catch (error) {
+      console.error("Failed to move file:", error)
+      // You might want to show a toast notification here
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between gap-2 max-sm:mt-2 max-sm:mb-1">
@@ -82,7 +195,7 @@ export function DataTable<TData extends Doc<"files">, TValue>({
         <FileViewSelector />
       </div>
 
-      <div className="overflow-x-scroll rounded-sm">
+      <div className="rounded-sm">
         <div
           data-view={view}
           className="data-[view=list]:divide-y data-[view=list]:flex data-[view=list]:flex-col text-sm rounded-sm"
@@ -131,7 +244,17 @@ export function DataTable<TData extends Doc<"files">, TValue>({
                   onClick={() => {
                     row.toggleSelected()
                   }}
-                  className="group flex hover:bg-muted/50 min-w-0 h-10 data-[state=selected]:bg-muted"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, row.original)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => handleDragOver(e, row.original)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, row.original)}
+                  className={cn(
+                    "group flex hover:bg-muted/50 min-w-0 h-10 data-[state=selected]:bg-muted",
+                    row.original.isFolder && dragOverRow === row.original._id && "ring-2 ring-primary ring-offset-2 rounded-md bg-muted/50",
+                    draggingRow === row.original._id && "opacity-50"
+                  )}
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => {

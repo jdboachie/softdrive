@@ -16,13 +16,13 @@ interface FileIconProps {
 
 export function FileIcon({ type, size = "md", className }: FileIconProps) {
   const sizeClasses = {
-    sm: "size-4",
+    sm: "size-5",
     md: "size-6",
     lg: "size-32",
   }
 
   const iconSize = {
-    sm: 16,
+    sm: 20,
     md: 24,
     lg: 128,
   }
@@ -40,7 +40,7 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
       <FolderSimpleIcon
         size={iconSize[size]}
         weight={'fill'}
-        className={cn(baseClasses, "!text-primary")}
+        className={cn(baseClasses, "!text-primary !size-5.5")}
       />
     )
   }

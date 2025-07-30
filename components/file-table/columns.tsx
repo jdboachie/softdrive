@@ -184,6 +184,7 @@ function FileLink({ file }: { file: Doc<"files"> }) {
             ? file.url
             : "#"
       }
+      onClick={(e) => e.stopPropagation()}
       className="flex gap-2 items-center w-fit lg:max-w-[65ch] max-lg:max-w-[35ch] max-sm:max-w-[20ch] hover:underline hover:underline-offset-3 decoration-dotted"
     >
       <FileIcon type={file.isFolder ? "folder" : file.type} size="sm" />
@@ -215,7 +216,8 @@ export function EditableFileName({ file }: { file: Doc<"files"> }) {
       },
     )
   }
-  React.useEffect(() => {
+
+  const highlightName = React.useCallback(() => {
     if (editing && inputRef.current) {
       const dotIndex = name.lastIndexOf(".")
       const end = dotIndex > 0 ? dotIndex : name.length
@@ -233,6 +235,7 @@ export function EditableFileName({ file }: { file: Doc<"files"> }) {
             ref={inputRef}
             placeholder={name}
             onChange={(e) => setName(e.target.value)}
+            onFocus={highlightName}
             onBlur={(e) => {
               e.stopPropagation()
               handleRename()
@@ -256,7 +259,7 @@ export function EditableFileName({ file }: { file: Doc<"files"> }) {
                   setEditing(true)
                   e.stopPropagation()
                 }}
-                className="!size-7 opacity-0 group-hover:opacity-100 text-muted-foreground text-sm ml-4"
+                className="!size-7 opacity-0 group-hover:opacity-100 text-muted-foreground text-sm ml-2"
               >
                 <PencilSimpleLineIcon />
               </Button>

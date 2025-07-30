@@ -1,8 +1,24 @@
 import { v } from "convex/values"
 import { getAuthUserId } from "@convex-dev/auth/server"
 import { paginationOptsValidator } from "convex/server"
-import { internalMutation, mutation, query } from "./_generated/server"
+import {
+  internalMutation,
+  mutation,
+  query,
+  MutationCtx,
+} from "./_generated/server"
 import { Id } from "./_generated/dataModel"
+
+async function getBreadcrumbs(
+  ctx: MutationCtx,
+  parentId?: Id<"files">
+): Promise<{ folderId: Id<"files">; folderName: string }[]> {
+  if (!parentId) return []
+  const parent = await ctx.db.get(parentId)
+  if (!parent) return []
+  const parentCrumbs = parent.breadcrumbs ?? []
+  return [...parentCrumbs, { folderId: parent._id, folderName: parent.name }]
+}
 
 export const getFileById = query({
   args: { id: v.id("files") },
@@ -113,7 +129,7 @@ export const getFilesPaginated = query({
     const pagination = await ctx.db
       .query("files")
       .withIndex("by_teamId_trashed", (q) =>
-        q.eq("teamId", args.teamId).eq("trashed", false),
+        q.eq("teamId", args.teamId).eq("trashed", false)
       )
       .order("desc")
       .paginate(args.paginationOpts)
@@ -125,7 +141,6 @@ export const getFilesPaginated = query({
 export const getTrashedFiles = query({
   args: {
     teamId: v.id("teams"),
-    // parentId: v.optional(v.id("files")),
     searchQuery: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -135,7 +150,7 @@ export const getTrashedFiles = query({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
@@ -146,14 +161,14 @@ export const getTrashedFiles = query({
     const files = await ctx.db
       .query("files")
       .withIndex("by_teamId_trashed", (q) =>
-        q.eq("teamId", args.teamId).eq("trashed", true),
+        q.eq("teamId", args.teamId).eq("trashed", true)
       )
       .collect()
 
     if (args.searchQuery?.trim()) {
       const searchLower = args.searchQuery.toLowerCase()
       return files.filter((file) =>
-        file.name?.toLowerCase().includes(searchLower),
+        file.name?.toLowerCase().includes(searchLower)
       )
     }
 
@@ -166,11 +181,19 @@ export const createFile = mutation({
     name: v.string(),
     size: v.number(),
     type: v.string(),
-    path: v.string(),
     teamId: v.id("teams"),
     storageId: v.optional(v.id("_storage")),
     isFolder: v.optional(v.boolean()),
     parentId: v.optional(v.id("files")),
+    path: v.optional(v.string()),
+    breadcrumbs: v.optional(
+      v.array(
+        v.object({
+          folderId: v.id("files"),
+          folderName: v.string(),
+        })
+      )
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -179,7 +202,7 @@ export const createFile = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
@@ -199,14 +222,15 @@ export const createFile = mutation({
       name: args.name,
       type: args.type,
       size: args.size,
-      path: args.path,
       isFolder: args.isFolder ?? false,
       parentId: args.parentId,
       authorId: userId,
       teamId: args.teamId,
       trashed: false,
       storageId: args.storageId,
-      url: url,
+      url,
+      path: args.path,
+      breadcrumbs: args.breadcrumbs ?? (await getBreadcrumbs(ctx, args.parentId)),
     })
   },
 })
@@ -227,7 +251,7 @@ export const renameFile = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
@@ -237,7 +261,13 @@ export const renameFile = mutation({
 
     await ctx.db.patch(args.fileId, {
       name: args.newName,
+      updatedAt: Date.now(),
     })
+
+    // If this is a folder, update breadcrumbs for all descendants
+    if (file.isFolder) {
+      await updateDescendantBreadcrumbsAfterRename(ctx, args.fileId, args.newName, args.teamId)
+    }
   },
 })
 
@@ -256,7 +286,7 @@ export const toggleFileIsStarred = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
@@ -285,16 +315,13 @@ export const trashFile = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
-    if (!membership) {
-      return
-    }
+    if (!membership) return
 
     const allowed = membership.role === "write" || membership.role === "admin"
-
     if (!allowed) throw new Error("No permission to trash this file")
 
     await ctx.db.patch(args.fileId, {
@@ -318,7 +345,7 @@ export const trashFolder = mutation({
       const children = await ctx.db
         .query("files")
         .withIndex("by_teamId_parentId_trashed", (q) =>
-          q.eq("teamId", teamId).eq("parentId", fileId),
+          q.eq("teamId", teamId).eq("parentId", fileId)
         )
         .collect()
 
@@ -346,12 +373,11 @@ export const restoreFile = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
     if (!membership || membership.role !== "admin") {
-      // or write
       throw new Error("No permission to restore this file")
     }
 
@@ -377,12 +403,11 @@ export const deleteFilePermanently = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
 
     if (!membership || membership.role !== "admin") {
-      // or write
       throw new Error("No permission to delete this file")
     }
 
@@ -401,8 +426,8 @@ export const deleteTrashedFilesViaCron = internalMutation({
       .filter((f) =>
         f.and(
           f.eq(f.field("trashed"), true),
-          f.lt(f.field("trashedAt"), cutoff),
-        ),
+          f.lt(f.field("trashedAt"), cutoff)
+        )
       )
       .collect()
 
@@ -423,11 +448,10 @@ export const deleteAllTrashedFiles = mutation({
     const membership = await ctx.db
       .query("memberships")
       .withIndex("by_userId_teamId", (q) =>
-        q.eq("userId", userId).eq("teamId", args.teamId),
+        q.eq("userId", userId).eq("teamId", args.teamId)
       )
       .unique()
     if (!membership || membership.role !== "admin") {
-      // or write
       throw new Error("No permission to empty trash")
     }
 
@@ -444,3 +468,168 @@ export const deleteAllTrashedFiles = mutation({
     }
   },
 })
+
+export const moveFile = mutation({
+  args: {
+    fileId: v.id("files"),
+    newParentId: v.optional(v.id("files")),
+    teamId: v.id("teams"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) throw new Error("Unauthorized")
+
+    const file = await ctx.db.get(args.fileId)
+    if (!file) throw new Error("File not found")
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId)
+      )
+      .unique()
+
+    if (!membership || membership.role === "read") {
+      throw new Error("No permission to move this file")
+    }
+
+    let breadcrumbs: { folderId: Id<"files">; folderName: string }[] = []
+    let newPath = file.name
+
+    if (args.newParentId) {
+      const newParent = await ctx.db.get(args.newParentId)
+      if (!newParent || !newParent.isFolder || newParent.trashed) {
+        throw new Error("Invalid target folder")
+      }
+
+      let current = newParent
+      while (current.parentId) {
+        if (current.parentId === args.fileId) {
+          throw new Error("Cannot move folder into its own descendant")
+        }
+        const parent = await ctx.db.get(current.parentId)
+        if (!parent) break
+        current = parent
+      }
+
+      breadcrumbs = [...(newParent.breadcrumbs ?? []), {
+        folderId: newParent._id,
+        folderName: newParent.name,
+      }]
+
+      newPath = newParent.path ? `${newParent.path}/${file.name}` : file.name
+    }
+
+    await ctx.db.patch(args.fileId, {
+      parentId: args.newParentId,
+      breadcrumbs,
+      path: newPath,
+      updatedAt: Date.now(),
+    })
+
+    if (file.isFolder) {
+      await updateDescendantPaths(ctx, args.fileId, newPath, args.teamId)
+      await updateDescendantBreadcrumbs(ctx, args.fileId, breadcrumbs, args.teamId)
+    }
+  },
+})
+
+// Helper function to recursively update paths of all descendants
+async function updateDescendantPaths(
+  ctx: MutationCtx,
+  folderId: Id<"files">,
+  newParentPath: string,
+  teamId: Id<"teams">
+) {
+  const children = await ctx.db
+    .query("files")
+    .withIndex("by_teamId_parentId_trashed", (q) =>
+      q.eq("teamId", teamId).eq("parentId", folderId).eq("trashed", false)
+    )
+    .collect()
+
+  const currentFolder = await ctx.db.get(folderId)
+  if (!currentFolder) return
+
+  const newPath = `${newParentPath}/${currentFolder.name}`
+
+  for (const child of children) {
+    const childPath = `${newPath}/${child.name}`
+    await ctx.db.patch(child._id, {
+      path: childPath,
+      updatedAt: Date.now(),
+    })
+
+    if (child.isFolder) {
+      await updateDescendantPaths(ctx, child._id, newPath, teamId)
+    }
+  }
+}
+
+async function updateDescendantBreadcrumbs(
+  ctx: MutationCtx,
+  folderId: Id<"files">,
+  parentBreadcrumbs: { folderId: Id<"files">; folderName: string }[],
+  teamId: Id<"teams">
+) {
+  const children = await ctx.db
+    .query("files")
+    .withIndex("by_teamId_parentId_trashed", (q) =>
+      q.eq("teamId", teamId).eq("parentId", folderId).eq("trashed", false)
+    )
+    .collect()
+
+  const currentFolder = await ctx.db.get(folderId)
+  if (!currentFolder) return
+
+  const breadcrumbs = [
+    ...parentBreadcrumbs,
+    { folderId: currentFolder._id, folderName: currentFolder.name },
+  ]
+
+  for (const child of children) {
+    await ctx.db.patch(child._id, {
+      breadcrumbs,
+      updatedAt: Date.now(),
+    })
+
+    if (child.isFolder) {
+      await updateDescendantBreadcrumbs(ctx, child._id, breadcrumbs, teamId)
+    }
+  }
+}
+
+async function updateDescendantBreadcrumbsAfterRename(
+  ctx: MutationCtx,
+  folderId: Id<"files">,
+  newName: string,
+  teamId: Id<"teams">
+) {
+  const children = await ctx.db
+    .query("files")
+    .withIndex("by_teamId_parentId_trashed", (q) =>
+      q.eq("teamId", teamId).eq("parentId", folderId).eq("trashed", false)
+    )
+    .collect()
+
+  const currentFolder = await ctx.db.get(folderId)
+  if (!currentFolder) return
+
+  for (const child of children) {
+    // Update the breadcrumbs to replace the old folder name with the new one
+    const updatedBreadcrumbs = child.breadcrumbs?.map(crumb =>
+      crumb.folderId === folderId
+        ? { ...crumb, folderName: newName }
+        : crumb
+    ) ?? []
+
+    await ctx.db.patch(child._id, {
+      breadcrumbs: updatedBreadcrumbs,
+      updatedAt: Date.now(),
+    })
+
+    if (child.isFolder) {
+      await updateDescendantBreadcrumbsAfterRename(ctx, child._id, newName, teamId)
+    }
+  }
+}
