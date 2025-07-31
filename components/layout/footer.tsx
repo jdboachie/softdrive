@@ -1,7 +1,8 @@
 import Link from "next/link"
 import {
-  GithubLogoIcon,
+  DotIcon,
   CopyrightIcon,
+  GithubLogoIcon,
   ArrowSquareOutIcon,
 } from "@phosphor-icons/react/dist/ssr"
 
@@ -18,10 +19,11 @@ export default function Footer() {
             href={"https://jude.vercel.app"}
             target="_blank"
             rel="noopener noreferrer"
+            className="flex items-center gap-1"
           >
-            Jude <ArrowSquareOutIcon className="ml-1 size-3" />
+            Jude <ArrowSquareOutIcon className="size-3" />
           </Link>
-          <div className="size-2 rounded-full bg-muted" />
+          <DotIcon weight='fill' className="size-3" />
           <Link
             href="https://www.github.com/jdboachie/softdrive"
             className="flex items-center gap-1 hover:text-foreground transition-colors"

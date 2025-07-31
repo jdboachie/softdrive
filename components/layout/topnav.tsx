@@ -101,7 +101,7 @@ export default function TopNav() {
 
 function TopNavSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-2 py-4 mt-3">
+    <div className="flex items-center gap-4 p-2 py-4 mt-1">
       <Skeleton className="h-2.5 w-10" />
       <Skeleton className="h-2.5 w-24" />
       <Skeleton className="h-2.5 w-16" />

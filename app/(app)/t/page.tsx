@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useTeam } from "@/hooks/use-team"
 import { useRouter } from "next/navigation"
 import { DataTableSkeleton } from "@/components/file-table/table"
+import { TitleBlockSkeleton } from "@/components/layout/title-block"
 
 function Page() {
   const [mounted, setMounted] = useState(false)
@@ -17,6 +18,7 @@ function Page() {
 
   return (
     <>
+      <TitleBlockSkeleton />
       {mounted && <DataTableSkeleton />}
     </>
   )
