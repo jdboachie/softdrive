@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { buttonVariants } from "@/components/ui/button"
+import { Skeleton } from "../ui/skeleton"
 
 export default function TopNav() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -66,7 +67,7 @@ export default function TopNav() {
     }
   }, [pathname])
 
-  if (links.length === 0) return null
+  if (links.length === 0) return <TopNavSkeleton />
 
   return (
     <div className="containor mx-auto">
@@ -94,6 +95,17 @@ export default function TopNav() {
           </Link>
         ))}
       </nav>
+    </div>
+  )
+}
+
+
+function TopNavSkeleton () {
+  return (
+    <div className="flex items-center gap-1">
+      <Skeleton className="h-8 w-28 rounded-md" />
+      <Skeleton className="h-8 w-28 rounded-md" />
+      <Skeleton className="h-8 w-28 rounded-md" />
     </div>
   )
 }
