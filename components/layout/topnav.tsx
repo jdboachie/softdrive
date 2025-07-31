@@ -1,3 +1,4 @@
+// topnav.tsx
 "use client"
 
 import Link from "next/link"
@@ -6,27 +7,39 @@ import { useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { buttonVariants } from "@/components/ui/button"
 
-const links = [
-  { label: "Drive", url: "" },
-  { label: "Trash", url: "/trash" },
-  // { label: "Starred", url: "/starred" },0.
-  // { label: "Settings", url: "/settings" },
-]
-
 export default function TopNav() {
   const containerRef = useRef<HTMLDivElement>(null)
   const underlineRef = useRef<HTMLSpanElement>(null)
-
   const pathname = usePathname()
-  const basePath = pathname.split("/").slice(0, 3).join("/") // /t/teamId
+
+  const isTeamPath = pathname.startsWith("/t/")
+  const isAppPath = pathname.startsWith("/account")
+
+  const basePath = isTeamPath
+    ? pathname.split("/").slice(0, 3).join("/") // /t/[teamId]
+    : "/account"
+
+  const links = isTeamPath
+    ? [
+        { label: "Drive", url: "" },
+        { label: "Trash", url: "/trash" },
+        { label: "Settings", url: "/settings" },
+      ]
+    : isAppPath
+    ? [
+        { label: "Account", url: "" },
+        { label: "Settings", url: "/settings" },
+      ]
+    : []
 
   const isActive = (url: string) => {
     if (url === "") {
-      // Match if base path or a folder under "files" (i.e., ends with /f/[id])
-      return pathname === basePath || /^\/t\/[^/]+\/f\/[^/]+$/.test(pathname)
+      return (
+        pathname === basePath ||
+        (isTeamPath && /^\/t\/[^/]+\/f\/[^/]+$/.test(pathname))
+      )
     }
-    const target = `${basePath}${url}`
-    return pathname.startsWith(target)
+    return pathname.startsWith(`${basePath}${url}`)
   }
 
   useEffect(() => {
@@ -53,6 +66,8 @@ export default function TopNav() {
     }
   }, [pathname])
 
+  if (links.length === 0) return null
+
   return (
     <div className="containor mx-auto">
       <nav
@@ -61,7 +76,7 @@ export default function TopNav() {
       >
         <span
           ref={underlineRef}
-          className="pointer-events-none absolute bottom-0 left-0 h-0.5 bg-primary rounded-full transition-all duration-300 ease-out z-50"
+          className="pointer-events-none absolute bottom-0 left-0 h-0.5 bg-primary rounded-t-full transition-all duration-300 ease-out z-50"
         />
         {links.map((link) => (
           <Link

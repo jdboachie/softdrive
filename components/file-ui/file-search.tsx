@@ -4,43 +4,37 @@ import {
   CommandDialog,
   CommandInput,
   CommandEmpty,
+  CommandItem,
 } from "@/components/ui/command"
 import { useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
-import { useDebouncedCallback } from "use-debounce"
 import { api } from "@/convex/_generated/api"
 import { useTeam } from "@/hooks/use-team"
 import { useStableQuery } from "@/hooks/use-stable-query"
-import { MagnifyingGlassIcon } from "@phosphor-icons/react"
-import { useRouter } from "next/navigation"
+import { MagnifyingGlassIcon, NavigationArrowIcon } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { FileIcon } from "./file-icon"
 import { FileActions } from "./file-actions"
+import Link from "next/link"
 
 export default function FileSearch({
+  disabled,
   folderId,
   trash,
 }: {
+  disabled?: boolean
   folderId?: Id<"files">
   trash?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined)
-  const router = useRouter()
   const { team } = useTeam()
 
   useHotkeys("f", (e) => {
     e.preventDefault()
     setOpen(true)
   })
-
-  const handleSelect = useDebouncedCallback((file: Doc<"files">) => {
-    setOpen(false)
-    if (!team) return
-    if (file.isFolder) router.push(`/t/${team._id}/f/${file._id}`)
-    else if (file.url) router.push(file.url)
-  }, 200)
 
   const files = useStableQuery(
     api.files.getFiles,
@@ -56,6 +50,7 @@ export default function FileSearch({
   return (
     <>
       <Button
+        disabled={disabled ?? false}
         variant="outline"
         size="icon"
         className="shadow-none rounded-full visible md:hidden"
@@ -65,34 +60,55 @@ export default function FileSearch({
       </Button>
       <span
         onClick={() => setOpen(true)}
-        className="flex max-md:hidden items-center space-x-2 rounded-lg border px-3 pr-2 py-1.5 text-sm text-muted-foreground transition"
+        className="flex max-md:hidden items-center space-x-1.5 rounded-md border px-3 pr-1.5 py-1.5 text-sm text-muted-foreground transition"
       >
-        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground pr-4 ">Search…</span>
-        <kbd className="ml-auto">
-          F
-        </kbd>
+        <MagnifyingGlassIcon className="size-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground pr-4">Search…</span>
+        <kbd className="ml-auto">F</kbd>
       </span>
 
       <CommandDialog open={open} onOpenChange={setOpen} showCloseButton={false}>
         <div className="grid relative w-full">
           <CommandInput
-            placeholder="Search files..."
+            placeholder="Find files..."
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
           <kbd className="absolute top-3 right-3">Esc</kbd>
         </div>
         <div className="scroll-py-1 overflow-x-hidden !max-h-92 overflow-y-auto p-1">
+          <CommandItem onClick={() => setOpen(false)}>
+            <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
+            <Link href={"/account"} className="size-full flex items-center gap-4">
+              Account <span className="text-xs text-muted-foreground">/account</span>
+            </Link>
+          </CommandItem>
+          <CommandItem onClick={() => setOpen(false)}>
+            <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
+            <Link href={"/account/settings"} className="size-full flex items-center gap-4">
+              Settings <span className="text-xs text-muted-foreground">/account/settings</span>
+            </Link>
+          </CommandItem>
           {files?.map((file: Doc<"files">) => (
-            <div
+            <Link
+              target={file.isFolder ? "_self" : "_blank"}
+              href={
+                file.isFolder && team
+                  ? `/t/${team._id}/f/${file._id}`
+                  : !file.isFolder && file.url
+                    ? file.url
+                    : "#"
+              }
               key={file._id}
-              onSelect={() => handleSelect(file)}
+              onSelect={() => setOpen(false)}
               className="group hover:bg-accent data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm p-2 py-2.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             >
               <div className="flex items-center justify-between w-full gap-2">
                 <span className="flex items-center gap-2 truncate max-w-[85%]">
-                  <FileIcon size="sm" type={file.isFolder ? "folder" : file.type} />
+                  <FileIcon
+                    size="sm"
+                    type={file.isFolder ? "folder" : file.type}
+                  />
                   <span className="truncate">{file.name}</span>
                 </span>
                 <div
@@ -104,7 +120,7 @@ export default function FileSearch({
                   <FileActions file={file} buttonVariant="outline" />
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
           {!files ||
             (files.length === 0 && (

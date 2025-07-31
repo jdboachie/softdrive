@@ -35,7 +35,7 @@ const schema = z.object({
   name: z.string().min(1, "Folder name is required"),
 })
 
-export default function CreateFolderButton() {
+export default function NewFolderButton() {
   const router = useRouter()
   const { team, loading } = useTeam()
   const createFile = useMutation(api.files.createFile)
@@ -45,7 +45,7 @@ export default function CreateFolderButton() {
 
   const parentFolder = useQuery(
     api.files.getFileById,
-    folderId ? { id: folderId } : "skip"
+    folderId ? { id: folderId } : "skip",
   )
 
   const [dialogOpen, setDialogOpen] = React.useState(false)
@@ -73,7 +73,9 @@ export default function CreateFolderButton() {
           teamId: team._id,
           isFolder: true,
           parentId: folderId,
-          path: parentFolder?.path ? parentFolder.path + '/' + values.name : values.name,
+          path: parentFolder?.path
+            ? parentFolder.path + "/" + values.name
+            : values.name,
           breadcrumbs: parentFolder
             ? [
                 ...(parentFolder.breadcrumbs ?? []),
@@ -88,7 +90,7 @@ export default function CreateFolderButton() {
         loading: "Creating folder...",
         success: "Folder created",
         error: "Failed to create folder",
-      }
+      },
     )
   }
 
@@ -100,28 +102,29 @@ export default function CreateFolderButton() {
           size="lg"
           variant={"outline"}
           onClick={() => setDialogOpen(true)}
-          className="max-md:w-full"
         >
           <FolderPlusIcon size={32} className="size-5" />
-          Create folder
+          New folder
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader className="border-b-0">
-          <DialogTitle>Create a new folder</DialogTitle>
+          <DialogTitle>New folder</DialogTitle>
           <DialogDescription>
-            This will add a folder under <span className="font-medium">{team?.name}</span>
-            {parentFolder
-              ? <>
-                  {' / '}
-                  <span className="font-medium">
-                    {parentFolder.breadcrumbs?.map(crumb => crumb.folderName).join(' / ')}
-                    {parentFolder.breadcrumbs?.length ? ' / ' : ''}
-                    {parentFolder.name}
-                  </span>
-                </>
-              : <b> / </b>
-            } in your file system.
+            This will create a new folder under{" "}
+            <span className="font-medium">{team?.name}</span>
+            {parentFolder && (
+              <>
+                {" / "}
+                <span className="font-medium">
+                  {parentFolder.breadcrumbs
+                    ?.map((crumb) => crumb.folderName)
+                    .join(" / ")}
+                  {parentFolder.breadcrumbs?.length ? " / " : ""}
+                  {parentFolder.name}
+                </span>
+              </>
+            )}{" "}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -155,8 +158,7 @@ export default function CreateFolderButton() {
               <Button
                 type="submit"
                 disabled={
-                  form.formState.isSubmitting ||
-                  !form.watch("name")?.trim()
+                  form.formState.isSubmitting || !form.watch("name")?.trim()
                 }
               >
                 Create folder

@@ -6,8 +6,8 @@ import { stringToMimeType } from "@/lib/utils"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { columns, trashColumns } from "@/components/file-table/columns"
 import { DataTable, DataTableSkeleton } from "@/components/file-table/table"
-import { useSearchParams } from "next/navigation"
 import { useStableQuery } from "@/hooks/use-stable-query"
+import { useFileExplorer } from "@/hooks/use-file-explorer"
 
 // const PAGE_SIZE = 50
 
@@ -19,8 +19,7 @@ export default function FileExplorerView({
   trash?: boolean
 }) {
   const { team } = useTeam()
-  const searchParams = useSearchParams()
-  const typeParam = searchParams.get("type") || ""
+  const { typeFilter } = useFileExplorer()
 
   const resolvedColumns = trash ? trashColumns : columns
   const endpoint = trash ? api.files.getTrashedFiles : api.files.getFiles
@@ -31,7 +30,7 @@ export default function FileExplorerView({
       ? {
           teamId: team._id,
           ...(!trash && { parentId: folderId }),
-          ...(!trash && typeParam && { type: stringToMimeType(typeParam) }),
+          ...(!trash && typeFilter && { type: stringToMimeType(typeFilter) }),
         }
       : "skip",
   )

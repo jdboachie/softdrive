@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useConvexAuth } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
-import { SignOutIcon } from "@phosphor-icons/react"
+import { LogOutIcon } from "lucide-react"
 
 export function SignOutButton() {
   const { isAuthenticated } = useConvexAuth()
@@ -19,10 +19,10 @@ export function SignOutButton() {
               router.push("/signin")
             })
           }
-          className="size-full flex items-center"
+          className="size-full flex items-center justify-between"
         >
-          <SignOutIcon className="mr-2" weight="bold" />
           Sign out
+          <LogOutIcon className="text-destructive" />
         </span>
       )}
     </>

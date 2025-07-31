@@ -10,10 +10,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import FileFilters from "@/components/file-ui/file-filters"
+import FileFilters from "@/components/file-ui/file-filter"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Doc } from "@/convex/_generated/dataModel"
-import { useFileView } from "@/hooks/use-file-view"
+import { useFileExplorer } from "@/hooks/use-file-explorer"
 import { FileViewSelector } from "@/components/file-ui/file-view-selector"
 import { ColumnVisibilityButton } from "./column-visibility-button"
 import FileCard from "../file-ui/file-card"
@@ -45,12 +45,13 @@ export function DataTable<TData extends Doc<"files">, TValue>({
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const { view } = useFileView()
-  const mobile = useIsMobile()
-  const moveFile = useMutation(api.files.moveFile)
-  const { team } = useTeam()
   const [dragOverRow, setDragOverRow] = React.useState<string | null>(null)
   const [draggingRow, setDraggingRow] = React.useState<string | null>(null)
+
+  const { team } = useTeam()
+  const mobile = useIsMobile()
+  const { view } = useFileExplorer()
+  const moveFile = useMutation(api.files.moveFile)
 
   const table = useReactTable({
     data,
@@ -85,11 +86,14 @@ export function DataTable<TData extends Doc<"files">, TValue>({
   }
 
   const handleDragStart = (e: React.DragEvent, file: Doc<"files">) => {
-    e.dataTransfer.setData("application/json", JSON.stringify({
-      fileId: file._id,
-      fileName: file.name,
-      isFolder: file.isFolder
-    }))
+    e.dataTransfer.setData(
+      "application/json",
+      JSON.stringify({
+        fileId: file._id,
+        fileName: file.name,
+        isFolder: file.isFolder,
+      }),
+    )
     e.dataTransfer.effectAllowed = "move"
     setDraggingRow(file._id)
 
@@ -172,7 +176,7 @@ export function DataTable<TData extends Doc<"files">, TValue>({
       await moveFile({
         fileId,
         newParentId: file._id,
-        teamId: team._id
+        teamId: team._id,
       })
     } catch (error) {
       console.error("Failed to move file:", error)
@@ -188,7 +192,8 @@ export function DataTable<TData extends Doc<"files">, TValue>({
           {table.getFilteredSelectedRowModel().rows.length !== 0 && (
             <span className="text-muted-foreground flex-1 text-sm">
               {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row{table.getFilteredRowModel().rows.length > 1 && 's'} selected.
+              {table.getFilteredRowModel().rows.length} row
+              {table.getFilteredRowModel().rows.length > 1 && "s"} selected.
             </span>
           )}
         </div>
@@ -252,8 +257,10 @@ export function DataTable<TData extends Doc<"files">, TValue>({
                   onDrop={(e) => handleDrop(e, row.original)}
                   className={cn(
                     "group flex hover:bg-muted/50 min-w-0 h-10 data-[state=selected]:bg-muted",
-                    row.original.isFolder && dragOverRow === row.original._id && "ring-2 ring-primary ring-offset-2 rounded-md bg-muted/50",
-                    draggingRow === row.original._id && "opacity-50"
+                    row.original.isFolder &&
+                      dragOverRow === row.original._id &&
+                      "ring-2 ring-primary ring-offset-2 rounded-md bg-muted/50",
+                    draggingRow === row.original._id && "opacity-50",
                   )}
                   data-state={row.getIsSelected() && "selected"}
                 >
@@ -300,7 +307,7 @@ export function DataTable<TData extends Doc<"files">, TValue>({
 }
 
 export function DataTableSkeleton() {
-  const { view } = useFileView()
+  const { view } = useFileExplorer()
 
   return (
     <div className="overflow-hidden flex flex-col gap-6 rounded-sm">

@@ -9,6 +9,7 @@ import {
   TrashIcon,
   StarIcon,
   DotsThreeVerticalIcon,
+  FolderSimpleIcon,
 } from "@phosphor-icons/react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
@@ -29,10 +30,27 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select"
 import { api } from "@/convex/_generated/api"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { useTeam } from "@/hooks/use-team"
-import { Doc } from "@/convex/_generated/dataModel"
+import { Doc, Id } from "@/convex/_generated/dataModel"
+import { useState } from "react"
 
 export const FileActions = ({
   file,
@@ -46,12 +64,22 @@ export const FileActions = ({
   useVerticalIcon?: boolean
 }) => {
   const { team, loading } = useTeam()
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false)
+  const [selectedFolderId, setSelectedFolderId] = useState<
+    Id<"files"> | null | undefined
+  >(null)
 
   const trashFile = useMutation(api.files.trashFile)
   const trashFolder = useMutation(api.files.trashFolder)
   const restoreFile = useMutation(api.files.restoreFile)
   const toggleFileFavorite = useMutation(api.files.toggleFileIsStarred)
   const deleteFilePermanently = useMutation(api.files.deleteFilePermanently)
+  const moveFile = useMutation(api.files.moveFile)
+
+  const folders = useQuery(
+    api.files.getFolders,
+    team ? { teamId: team._id, excludeFileId: file._id } : "skip",
+  )
 
   return (
     <DropdownMenu>
@@ -183,6 +211,108 @@ export const FileActions = ({
               <DownloadSimpleIcon weight="bold" />
               Download file
             </DropdownMenuItem>
+
+            <Dialog open={moveDialogOpen} onOpenChange={setMoveDialogOpen}>
+              <DialogTrigger asChild>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setMoveDialogOpen(true)
+                  }}
+                >
+                  <FolderSimpleIcon weight="bold" />
+                  Move to...
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DialogContent onClick={(e) => e.stopPropagation()}>
+                <DialogHeader>
+                  <DialogTitle>Move &quot;{file.name}&quot;</DialogTitle>
+                  <DialogDescription>
+                    Select a destination folder for this{" "}
+                    {file.isFolder ? "folder" : "file"}.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 p-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Destination folder
+                    </label>
+                    <Select
+                      value={selectedFolderId || ""}
+                      onValueChange={(value) => {
+                        if (value === "root") setSelectedFolderId(undefined)
+                        else setSelectedFolderId(value as Id<"files">)
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a folder" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="root">
+                          <div className="flex items-center gap-2">
+                            <FolderSimpleIcon
+                              weight="fill"
+                              className="size-4"
+                            />
+                            <span>Root folder</span>
+                          </div>
+                        </SelectItem>
+                        {folders?.map((folder) => (
+                          <SelectItem key={folder._id} value={folder._id}>
+                            <div className="flex items-center gap-2">
+                              <FolderSimpleIcon
+                                weight="fill"
+                                className="size-4"
+                              />
+                              <span>{folder.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setMoveDialogOpen(false)
+                      setSelectedFolderId(null)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      if (!team) return
+
+                      try {
+                        await moveFile({
+                          fileId: file._id,
+                          newParentId: selectedFolderId || undefined,
+                          teamId: team._id,
+                        })
+
+                        toast.success("File moved successfully")
+                        setMoveDialogOpen(false)
+                        setSelectedFolderId(null)
+                      } catch (error) {
+                        toast.error("Failed to move file", {
+                          description:
+                            error instanceof Error
+                              ? error.message
+                              : "Unknown error",
+                        })
+                      }
+                    }}
+                    disabled={!selectedFolderId && selectedFolderId !== null}
+                  >
+                    Move
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             <DropdownMenuItem
               variant="destructive"

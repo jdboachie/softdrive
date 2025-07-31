@@ -2,53 +2,33 @@
 
 import * as React from "react"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { ChevronDownIcon, LayoutGridIcon, LogsIcon } from "lucide-react"
-import { useFileView } from "@/hooks/use-file-view"
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/toggle-group"
+import { LayoutGridIcon, LogsIcon } from "lucide-react"
+import { useFileExplorer } from "@/hooks/use-file-explorer"
 
-const VIEWS = ["list", "grid"] as const
+// const VIEWS = ["list", "grid"] as const
 
 export function FileViewSelector() {
-  const { view, changeView } = useFileView()
+  const { view, changeView } = useFileExplorer()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          {view === "list" ? <LogsIcon /> : <LayoutGridIcon />}
-          <ChevronDownIcon className="ml-2" />
-          <span className="sr-only">Toggle view</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>File view</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {VIEWS.map((v) => (
-            <DropdownMenuItem key={v} onSelect={() => changeView(v)}>
-              {v === "list" ? (
-                <>
-                  <LogsIcon />
-                  List
-                </>
-              ) : (
-                <>
-                  <LayoutGridIcon />
-                  Grid
-                </>
-              )}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <ToggleGroup
+      type="single"
+      value={view}
+      size={'sm'}
+      onValueChange={(v) => {
+        if (v) changeView(v as "list" | "grid")
+      }}
+      className="!shadow-inner rounded-md p-px bg-accent border dark:bg-background"
+    >
+      <ToggleGroupItem value="list" aria-label="List view" className="dark:data-[state=on]:bg-accent data-[state=on]:bg-background !rounded-sm data-[state=on]:shadow-md">
+        <LogsIcon className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="grid" aria-label="Grid view" className="dark:data-[state=on]:bg-accent data-[state=on]:bg-background !rounded-sm data-[state=on]:shadow-md">
+        <LayoutGridIcon className="h-4 w-4" />
+      </ToggleGroupItem>
+    </ToggleGroup>
   )
 }

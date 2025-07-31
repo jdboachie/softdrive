@@ -16,9 +16,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { TreeViewIcon } from "@phosphor-icons/react"
-
-const capitalize = (s: string) =>
-  s.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+import { capitalize } from "@/lib/utils"
 
 const Breadcrumbs = () => {
   const pathname = usePathname()

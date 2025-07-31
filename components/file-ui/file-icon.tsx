@@ -4,6 +4,7 @@ import {
   FilePdfIcon,
   MicrosoftWordLogoIcon,
   FolderSimpleIcon,
+  FileTextIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { ImageIcon } from "lucide-react"
@@ -16,7 +17,7 @@ interface FileIconProps {
 
 export function FileIcon({ type, size = "md", className }: FileIconProps) {
   const sizeClasses = {
-    sm: "size-5",
+    sm: "size-4.5",
     md: "size-6",
     lg: "size-32",
   }
@@ -29,7 +30,11 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
 
   const weight = size === "md" ? "bold" : size === "sm" ? "regular" : "thin"
 
-  const baseClasses = cn("shrink-0 text-foreground", sizeClasses[size], className)
+  const baseClasses = cn(
+    "shrink-0 text-foreground",
+    sizeClasses[size],
+    className,
+  )
 
   if (!type) {
     return <div className={cn("bg-accent rounded-sm", baseClasses)} />
@@ -39,8 +44,8 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
     return (
       <FolderSimpleIcon
         size={iconSize[size]}
-        weight={'fill'}
-        className={cn(baseClasses, "!text-primary !size-5.5")}
+        weight={"fill"}
+        className={cn(baseClasses, "!text-primary")}
       />
     )
   }
@@ -65,6 +70,16 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
     )
   }
 
+  if (type === "text/plain") {
+    return (
+      <FileTextIcon
+        size={iconSize[size]}
+        weight={weight}
+        className={baseClasses}
+      />
+    )
+  }
+
   if (type === "application/json") {
     return (
       <BracketsCurlyIcon
@@ -75,7 +90,7 @@ export function FileIcon({ type, size = "md", className }: FileIconProps) {
     )
   }
 
-  if (type.startsWith('image/')) {
+  if (type.startsWith("image/")) {
     return (
       <ImageIcon
         size={iconSize[size]}

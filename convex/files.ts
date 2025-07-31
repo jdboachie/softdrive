@@ -27,6 +27,44 @@ export const getFileById = query({
   },
 })
 
+export const getFolders = query({
+  args: {
+    teamId: v.id("teams"),
+    excludeFileId: v.optional(v.id("files")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) return []
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId_teamId", (q) =>
+        q.eq("userId", userId).eq("teamId", args.teamId)
+      )
+      .unique()
+
+    if (!membership) {
+      throw new Error("User does not have access to this team")
+    }
+
+    const folders = await ctx.db
+      .query("files")
+      .withIndex("by_teamId_trashed", (q) =>
+        q.eq("teamId", args.teamId).eq("trashed", false)
+      )
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("isFolder"), true),
+          args.excludeFileId ? q.neq(q.field("_id"), args.excludeFileId) : true
+        )
+      )
+      .order("asc")
+      .collect()
+
+    return folders
+  },
+})
+
 export const getFiles = query({
   args: {
     teamId: v.id("teams"),

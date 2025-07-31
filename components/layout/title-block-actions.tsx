@@ -1,20 +1,24 @@
 "use client"
 
-import UploadButton from "../action-buttons/upload-button"
 import { usePathname } from "next/navigation"
+import UploadButton from "../action-buttons/upload-button"
 import EmptyTrashButton from "../action-buttons/empty-trash-button"
-import CreateFolderButton from "../action-buttons/create-folder-button"
+import NewFolderButton from "../action-buttons/new-folder-button"
 
 export default function TitleBlockActions() {
   const pathname = usePathname()
-  const segments = pathname.split("/").filter(Boolean)
 
+  if (!pathname.startsWith("/t")) {
+    return undefined
+  }
+
+  const segments = pathname.split("/").filter(Boolean)
   const current = segments[2] ?? "files"
 
   if (current === "files" || current === "f" || current === "my-drive")
     return (
       <>
-        <CreateFolderButton />
+        <NewFolderButton />
         <UploadButton />
       </>
     )

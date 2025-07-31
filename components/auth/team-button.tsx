@@ -22,7 +22,7 @@ import { api } from "@/convex/_generated/api"
 import { Button } from "@/components/ui/button"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useTeam } from "@/hooks/use-team"
-import CreateTeamButton from "./create-team-button"
+// import CreateTeamButton from "./create-team-button"
 import { Skeleton } from "../ui/skeleton"
 
 export default function TeamButton() {
@@ -48,7 +48,9 @@ export default function TeamButton() {
           aria-expanded={open}
           className="min-w-[200px] justify-start px-1.5 max-sm:-translate-x-3"
         >
-          {value && <Avatar name={team?.name ?? undefined} />}
+          {value && (
+            <Avatar name={team?.name ?? undefined} className="size-4.5" />
+          )}
           {value === undefined ? (
             <Skeleton className="h-full w-full" />
           ) : (
@@ -61,7 +63,7 @@ export default function TeamButton() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="!min-w-[100px] w-24 p-0 max-sm:mx-2">
+      <PopoverContent className="!min-w-fit p-0 max-sm:mx-2">
         <Command>
           <CommandInput placeholder="Search teams..." className="h-9" />
           <CommandList>
@@ -72,7 +74,7 @@ export default function TeamButton() {
                   key={team._id}
                   value={team.name}
                   onSelect={(selectedName) => {
-                    setValue(selectedName === value ? "" : selectedName)
+                    setValue(selectedName)
                     const selectedTeam = userTeams?.find(
                       (t) => t.name === selectedName,
                     )
@@ -82,6 +84,7 @@ export default function TeamButton() {
                     setOpen(false)
                   }}
                 >
+                  <Avatar name={team?.name ?? undefined} className="size-4.5" />
                   {team.name}
                   <Check
                     className={cn(
@@ -94,9 +97,9 @@ export default function TeamButton() {
             </CommandGroup>
           </CommandList>
         </Command>
-        <div className="grid px-1 pb-1">
+        {/* <div className="grid px-1 pb-1">
           <CreateTeamButton />
-        </div>
+        </div> */}
       </PopoverContent>
     </Popover>
   )

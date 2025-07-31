@@ -5,7 +5,7 @@ import {
 } from "@convex-dev/auth/nextjs/server";
 
 const isSignInPage = createRouteMatcher(["/signin"]);
-const isProtectedRoute = createRouteMatcher(["/t", "/t/:teamId", "/t/:teamId/(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/t", "/t/:teamId", "/t/:teamId/(.*)", "/account", "/account/(.*)"]);
 
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {

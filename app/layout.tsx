@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "Softdrive",
   description: "Your personal drive in the cloud",
   icons: {
-    icon: "/convex.svg",
+    icon: "/favicon.svg",
   },
 }
 
@@ -34,6 +34,7 @@ const sans = LocalFont({
     },
   ],
   variable: "--font-sans",
+  fallback: ["inter", "sans"],
 })
 
 const geistMono = Geist_Mono({
