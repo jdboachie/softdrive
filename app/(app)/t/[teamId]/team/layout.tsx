@@ -7,11 +7,11 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
         links={[
           {
             label: "General",
-            url: "/t/:teamId/settings",
+            url: "/t/:teamId/team",
           },
           {
             label: "Team",
-            url: "/t/:teamId/settings/team",
+            url: "/t/:teamId/team/team",
           },
         ]}
       />

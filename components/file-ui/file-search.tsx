@@ -77,16 +77,28 @@ export default function FileSearch({
           <kbd className="absolute top-3 right-3">Esc</kbd>
         </div>
         <div className="scroll-py-1 overflow-x-hidden !max-h-92 overflow-y-auto p-1">
-          <CommandItem onClick={() => setOpen(false)}>
+          <CommandItem>
             <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
-            <Link href={"/account"} className="size-full flex items-center gap-4">
-              Account <span className="text-xs text-muted-foreground">/account</span>
+            <Link
+              href={"/account"}
+              onClick={() => setOpen(false)}
+              className="size-full flex items-center gap-4"
+            >
+              Account{" "}
+              <span className="text-xs text-muted-foreground">/account</span>
             </Link>
           </CommandItem>
-          <CommandItem onClick={() => setOpen(false)}>
+          <CommandItem>
             <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
-            <Link href={"/account/settings"} className="size-full flex items-center gap-4">
-              Settings <span className="text-xs text-muted-foreground">/account/settings</span>
+            <Link
+              href={"/account/settings"}
+              onClick={() => setOpen(false)}
+              className="size-full flex items-center gap-4"
+            >
+              Settings{" "}
+              <span className="text-xs text-muted-foreground">
+                /account/settings
+              </span>
             </Link>
           </CommandItem>
           {files?.map((file: Doc<"files">) => (
