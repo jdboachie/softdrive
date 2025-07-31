@@ -78,12 +78,12 @@ export default function FileSearch({
         </div>
         <div className="scroll-py-1 overflow-x-hidden !max-h-92 overflow-y-auto p-1">
           <CommandItem>
-            <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
             <Link
               href={"/account"}
               onClick={() => setOpen(false)}
               className="size-full flex items-center gap-4"
             >
+              <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
               Account{" "}
               <span className="text-xs text-muted-foreground">/account</span>
             </Link>
