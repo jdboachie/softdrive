@@ -2,7 +2,7 @@ import { SlashIcon } from "lucide-react"
 import UserButton from "@/components/auth/user-button"
 import { TabsIcon } from "@phosphor-icons/react/dist/ssr"
 import TeamButton from "@/components/auth/team-button"
-import TopNav from "./topnav"
+import TopNav, { TopNavSkeleton } from "./topnav"
 import { Skeleton } from "@/components/ui/skeleton"
 import FileSearch from "../file-ui/file-search"
 import Link from "next/link"
@@ -45,12 +45,7 @@ export function HeaderSkeleton() {
         </div>
       </div>
       <div className="containor mx-auto">
-        <nav className="flex p-2 gap-1">
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-8 w-20" />
-        </nav>
+        <TopNavSkeleton />
       </div>
     </header>
   )

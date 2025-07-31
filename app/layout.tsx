@@ -2,7 +2,6 @@ import "./globals.css"
 
 import type { Metadata } from "next"
 import LocalFont from "next/font/local"
-import { Geist_Mono } from "next/font/google"
 
 import { Toaster } from "@/components/ui/sonner"
 import { TeamProvider } from "@/hooks/use-team"
@@ -37,11 +36,6 @@ const sans = LocalFont({
   fallback: ["inter", "sans"],
 })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,7 +44,7 @@ export default function RootLayout({
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${sans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${sans.variable} antialiased`}>
           <ConvexClientProvider>
             <ThemeProvider
               attribute="class"

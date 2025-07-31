@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -65,6 +64,8 @@ export const FileActions = ({
 }) => {
   const { team, loading } = useTeam()
   const [moveDialogOpen, setMoveDialogOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedFolderId, setSelectedFolderId] = useState<
     Id<"files"> | null | undefined
   >(null)
@@ -82,7 +83,8 @@ export const FileActions = ({
   )
 
   return (
-    <DropdownMenu>
+    <>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           disabled={loading}
@@ -133,51 +135,17 @@ export const FileActions = ({
               <ArrowCounterClockwiseIcon weight="bold" />
               Restore
             </DropdownMenuItem>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={(e) => {
-                    // e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                >
-                  <FileXIcon weight="bold" />
-                  Delete forever
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete forever?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. The file will be permanently
-                    deleted and cannot be recovered.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    onClick={() => {
-                      if (!team) return
-                      toast.promise(
-                        deleteFilePermanently({
-                          teamId: team._id,
-                          fileId: file._id,
-                        }),
-                        {
-                          loading: "Deleting file...",
-                          success: "Deleted successfully",
-                          error: "Error deleting file",
-                        },
-                      )
-                    }}
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={(e) => {
+                e.preventDefault()
+                setDropdownOpen(false)
+                setDeleteDialogOpen(true)
+              }}
+            >
+              <FileXIcon weight="bold" />
+              Delete forever
+            </DropdownMenuItem>
           </>
         ) : (
           <>
@@ -355,5 +323,40 @@ export const FileActions = ({
         )}
       </DropdownMenuContent>
     </DropdownMenu>
+
+    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete forever?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. The file will be permanently
+            deleted and cannot be recovered.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => {
+              if (!team) return
+              toast.promise(
+                deleteFilePermanently({
+                  teamId: team._id,
+                  fileId: file._id,
+                }),
+                {
+                  loading: "Deleting file...",
+                  success: "Deleted successfully",
+                  error: "Error deleting file",
+                },
+              )
+            }}
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   )
 }
