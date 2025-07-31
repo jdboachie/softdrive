@@ -20,6 +20,7 @@ import { UserIcon, UsersIcon, TabsIcon } from "@phosphor-icons/react"
 import { CogIcon } from "lucide-react"
 import ThemeToggle from "../theme/theme-toggle"
 import { useTeam } from "@/hooks/use-team"
+import Link from "next/link"
 
 export default function UserButton() {
   const router = useRouter()
@@ -84,15 +85,15 @@ export default function UserButton() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className={`!justify-between`}>
+        <DropdownMenuItem disabled className={`!justify-between`}>
           Find <kbd>F</kbd>
         </DropdownMenuItem>
         <span className="w-full p-2 text-sm flex items-center justify-between">
           Theme <ThemeToggle />
         </span>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className={`!justify-between`}>
-          Home page <TabsIcon weight="fill" />
+        <DropdownMenuItem asChild className={`!justify-between`}>
+          <Link href={'/'} className="size-full">Home page <TabsIcon weight="fill" /></Link>
         </DropdownMenuItem>
         <DropdownMenuItem variant={"destructive"}>
           <SignOutButton />

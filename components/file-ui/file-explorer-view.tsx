@@ -14,15 +14,20 @@ import { useFileExplorer } from "@/hooks/use-file-explorer"
 export default function FileExplorerView({
   folderId,
   trash,
+  starred
 }: {
   folderId?: Id<"files">
   trash?: boolean
+  starred?: boolean
 }) {
   const { team } = useTeam()
   const { typeFilter } = useFileExplorer()
 
   const resolvedColumns = trash ? trashColumns : columns
-  const endpoint = trash ? api.files.getTrashedFiles : api.files.getFiles
+  let endpoint
+  if (trash) endpoint = api.files.getTrashedFiles
+  else if (starred) endpoint = api.files.getFiles
+  else endpoint = api.files.getFiles
 
   const files = useStableQuery(
     endpoint,

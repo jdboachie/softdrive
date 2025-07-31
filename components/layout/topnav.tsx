@@ -24,7 +24,7 @@ export default function TopNav() {
     ? [
         { label: "Drive", url: "" },
         { label: "Trash", url: "/trash" },
-        { label: "Settings", url: "/settings" },
+        { label: "Team", url: "/team" },
       ]
     : isAppPath
     ? [
@@ -102,10 +102,10 @@ export default function TopNav() {
 
 function TopNavSkeleton () {
   return (
-    <div className="flex items-center gap-1">
-      <Skeleton className="h-8 w-28 rounded-md" />
-      <Skeleton className="h-8 w-28 rounded-md" />
-      <Skeleton className="h-8 w-28 rounded-md" />
+    <div className="flex items-center gap-1 p-2">
+      <Skeleton className="h-2.5 w-24" />
+      <Skeleton className="h-2.5 w-24" />
+      <Skeleton className="h-2.5 w-24" />
     </div>
   )
 }

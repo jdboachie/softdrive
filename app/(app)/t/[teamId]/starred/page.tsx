@@ -1,7 +1,5 @@
-import React from 'react'
+import FileExplorerView from "@/components/file-ui/file-explorer-view";
 
-export default function FavoritesPage() {
-  return (
-    <div>FavoritesPage</div>
-  )
+export default function Page() {
+  return <FileExplorerView starred />
 }
