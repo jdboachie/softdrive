@@ -27,11 +27,11 @@ export default function TopNav() {
         { label: "Team", url: "/team" },
       ]
     : isAppPath
-    ? [
-        { label: "Account", url: "" },
-        { label: "Settings", url: "/settings" },
-      ]
-    : []
+      ? [
+          { label: "Account", url: "" },
+          { label: "Settings", url: "/settings" },
+        ]
+      : []
 
   const isActive = (url: string) => {
     if (url === "") {
@@ -81,7 +81,7 @@ export default function TopNav() {
         />
         {links.map((link) => (
           <Link
-            prefetch
+            prefetch={true}
             key={link.label}
             href={`${basePath}${link.url}`}
             className={cn(
@@ -99,13 +99,12 @@ export default function TopNav() {
   )
 }
 
-
-function TopNavSkeleton () {
+function TopNavSkeleton() {
   return (
-    <div className="flex items-center gap-1 p-2">
+    <div className="flex items-center gap-10 p-2 py-3">
+      <Skeleton className="h-2.5 w-16" />
       <Skeleton className="h-2.5 w-24" />
-      <Skeleton className="h-2.5 w-24" />
-      <Skeleton className="h-2.5 w-24" />
+      <Skeleton className="h-2.5 w-20" />
     </div>
   )
 }
