@@ -10,7 +10,7 @@ export default function Footer() {
   return (
     <footer className="border-t">
       <div className="font-medium px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-muted-foreground">
-        <span>
+        <span className="flex items-center gap-1">
           <CopyrightIcon weight="bold" className="size-3" /> 2025 Softdrive
         </span>
         <div className="flex items-center gap-1">
@@ -19,7 +19,7 @@ export default function Footer() {
             href={"https://jude.vercel.app"}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 hover:text-foreground transition-colors"
           >
             Jude <ArrowSquareOutIcon className="size-3" />
           </Link>

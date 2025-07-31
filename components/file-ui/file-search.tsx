@@ -89,12 +89,12 @@ export default function FileSearch({
             </Link>
           </CommandItem>
           <CommandItem>
-            <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
             <Link
               href={"/account/settings"}
               onClick={() => setOpen(false)}
               className="size-full flex items-center gap-4"
             >
+              <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
               Settings{" "}
               <span className="text-xs text-muted-foreground">
                 /account/settings
