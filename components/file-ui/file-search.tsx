@@ -77,30 +77,6 @@ export default function FileSearch({
           <kbd className="absolute top-3 right-3">Esc</kbd>
         </div>
         <div className="scroll-py-1 overflow-x-hidden !max-h-92 overflow-y-auto p-1">
-          <CommandItem>
-            <Link
-              href={"/account"}
-              onClick={() => setOpen(false)}
-              className="size-full flex items-center gap-4"
-            >
-              <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
-              Account{" "}
-              <span className="text-xs text-muted-foreground">/account</span>
-            </Link>
-          </CommandItem>
-          <CommandItem>
-            <Link
-              href={"/account/settings"}
-              onClick={() => setOpen(false)}
-              className="size-full flex items-center gap-4"
-            >
-              <NavigationArrowIcon weight="bold" className="mr-1 size-4" />
-              Settings{" "}
-              <span className="text-xs text-muted-foreground">
-                /account/settings
-              </span>
-            </Link>
-          </CommandItem>
           {files?.map((file: Doc<"files">) => (
             <Link
               target={file.isFolder ? "_self" : "_blank"}
@@ -140,6 +116,30 @@ export default function FileSearch({
                 No files found. Try searching for something else
               </CommandEmpty>
             ))}
+          <CommandItem className="!p-0 !py-0">
+            <Link
+              href={"/account"}
+              onClick={() => setOpen(false)}
+              className="size-full flex items-center gap-1 p-2 py-2.5"
+            >
+              <NavigationArrowIcon weight="bold" className="size-4" />
+              Account{" "}
+              <span className="text-xs text-muted-foreground">/account</span>
+            </Link>
+          </CommandItem>
+          <CommandItem className="!p-0 !py-0">
+            <Link
+              href={"/account/settings"}
+              onClick={() => setOpen(false)}
+              className="size-full flex items-center gap-1 p-2 py-2.5"
+            >
+              <NavigationArrowIcon weight="bold" className="size-4" />
+              Settings{" "}
+              <span className="text-xs text-muted-foreground">
+                /account/settings
+              </span>
+            </Link>
+          </CommandItem>
         </div>
       </CommandDialog>
     </>
