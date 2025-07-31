@@ -120,7 +120,7 @@ export default function FileSearch({
             <Link
               href={"/account"}
               onClick={() => setOpen(false)}
-              className="size-full flex items-center gap-1 p-2 py-2.5"
+              className="size-full flex items-center gap-2 p-2 py-2.5"
             >
               <NavigationArrowIcon weight="bold" className="size-4" />
               Account{" "}
@@ -131,7 +131,7 @@ export default function FileSearch({
             <Link
               href={"/account/settings"}
               onClick={() => setOpen(false)}
-              className="size-full flex items-center gap-1 p-2 py-2.5"
+              className="size-full flex items-center gap-2 p-2 py-2.5"
             >
               <NavigationArrowIcon weight="bold" className="size-4" />
               Settings{" "}
