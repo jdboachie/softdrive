@@ -325,7 +325,7 @@ export const FileActions = ({
     </DropdownMenu>
 
     <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete forever?</AlertDialogTitle>
           <AlertDialogDescription>

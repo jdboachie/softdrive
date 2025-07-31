@@ -10,7 +10,7 @@ export default function SignIn() {
       <HeaderSkeleton />
       <TitleBlockSkeleton />
       <div className="z-50 h-screen overflow-hidden w-screen absolute inset-0 grid place-items-center gap-2 backdrop-blur-md">
-        <div className="flex sm:flex-col sm:items-center gap-4">
+        <div className="flex max-sm:flex-col sm:items-center gap-4">
           Sign in to continue
           <SignInButton />
         </div>
